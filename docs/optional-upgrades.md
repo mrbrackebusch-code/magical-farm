@@ -25,10 +25,10 @@ Purchase labels, current/next values, prices, and effects are populated from the
 - The repeat structures do not change.
 - A purchase does not prove the learner program is correct.
 
-![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Starter Beds expansion: reuse the same counted-repeat code.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U-A1-MENU.png)
+![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Starter Beds expansion: reuse the same counted-repeat code.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U-A1-MENU.png)
 
 *Starter Beds expansion: reuse the same counted-repeat code purchase-panel evidence.*
-![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U-A1-RUN.gif)
+![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U-A1-RUN.gif)
 
 *Starter Beds expansion: reuse the same counted-repeat code prediction/reuse run.*
 
@@ -50,10 +50,10 @@ Purchase labels, current/next values, prices, and effects are populated from the
 - The repeat structure is unchanged.
 - No hidden damage upgrade is bundled.
 
-![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Six-Shooter: chamber capacity.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U01-MENU.png)
+![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Six-Shooter: chamber capacity.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U01-MENU.png)
 
 *Six-Shooter: chamber capacity purchase-panel evidence.*
-![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U01-RUN.gif)
+![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U01-RUN.gif)
 
 *Six-Shooter: chamber capacity prediction/reuse run.*
 
@@ -75,10 +75,10 @@ Purchase labels, current/next values, prices, and effects are populated from the
 - Neither head moves outside the loop.
 - No unrelated strength stat changes.
 
-![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Twinbud: paired firing cycles.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U02-MENU.png)
+![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Twinbud: paired firing cycles.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U02-MENU.png)
 
 *Twinbud: paired firing cycles purchase-panel evidence.*
-![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U02-RUN.gif)
+![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U02-RUN.gif)
 
 *Twinbud: paired firing cycles prediction/reuse run.*
 
@@ -100,10 +100,10 @@ Purchase labels, current/next values, prices, and effects are populated from the
 - The world still owns which patches exist.
 - No damage increase is bundled.
 
-![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Mineberry: prepared trap patches.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U03-MENU.png)
+![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Mineberry: prepared trap patches.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U03-MENU.png)
 
 *Mineberry: prepared trap patches purchase-panel evidence.*
-![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U03-RUN.gif)
+![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U03-RUN.gif)
 
 *Mineberry: prepared trap patches prediction/reuse run.*
 
@@ -125,10 +125,10 @@ Purchase labels, current/next values, prices, and effects are populated from the
 - The learner still performs the +1 change.
 - No hidden bundled combat stats change.
 
-![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Rage Orchid: starting strike damage.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U04-MENU.png)
+![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Rage Orchid: starting strike damage.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U04-MENU.png)
 
 *Rage Orchid: starting strike damage purchase-panel evidence.*
-![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U04-RUN.gif)
+![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U04-RUN.gif)
 
 *Rage Orchid: starting strike damage prediction/reuse run.*
 
@@ -150,10 +150,10 @@ Purchase labels, current/next values, prices, and effects are populated from the
 - Pierce/splash meanings do not change.
 - No new attack type is purchased.
 
-![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Prism Bloom: number of marked targets.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U05-MENU.png)
+![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Prism Bloom: number of marked targets.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U05-MENU.png)
 
 *Prism Bloom: number of marked targets purchase-panel evidence.*
-![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U05-RUN.gif)
+![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U05-RUN.gif)
 
 *Prism Bloom: number of marked targets prediction/reuse run.*
 
@@ -175,10 +175,10 @@ Purchase labels, current/next values, prices, and effects are populated from the
 - The learner still decrements sunlight by 1.
 - Spent energy is not recreated by the purchase.
 
-![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Sunbeam Lily: stored sunlight capacity.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U06-MENU.png)
+![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Sunbeam Lily: stored sunlight capacity.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U06-MENU.png)
 
 *Sunbeam Lily: stored sunlight capacity purchase-panel evidence.*
-![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U06-RUN.gif)
+![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U06-RUN.gif)
 
 *Sunbeam Lily: stored sunlight capacity prediction/reuse run.*
 
@@ -200,10 +200,10 @@ Purchase labels, current/next values, prices, and effects are populated from the
 - index + 1 remains the visible radius.
 - No second learner counter is introduced.
 
-![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Echo Mushroom: pulse levels.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U07-MENU.png)
+![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Echo Mushroom: pulse levels.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U07-MENU.png)
 
 *Echo Mushroom: pulse levels purchase-panel evidence.*
-![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U07-RUN.gif)
+![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U07-RUN.gif)
 
 *Echo Mushroom: pulse levels prediction/reuse run.*
 
@@ -225,10 +225,10 @@ Purchase labels, current/next values, prices, and effects are populated from the
 - Healthy allies remain a no-action case.
 - Heal strength is unchanged.
 
-![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Healroot: allies to inspect.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U08-MENU.png)
+![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Healroot: allies to inspect.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U08-MENU.png)
 
 *Healroot: allies to inspect purchase-panel evidence.*
-![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U08-RUN.gif)
+![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U08-RUN.gif)
 
 *Healroot: allies to inspect prediction/reuse run.*
 
@@ -250,10 +250,10 @@ Purchase labels, current/next values, prices, and effects are populated from the
 - Each cap is opened once.
 - The algorithm remains nested.
 
-![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Sporecap Colony: spore caps.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U09-MENU.png)
+![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Sporecap Colony: spore caps.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U09-MENU.png)
 
 *Sporecap Colony: spore caps purchase-panel evidence.*
-![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U09-RUN.gif)
+![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U09-RUN.gif)
 
 *Sporecap Colony: spore caps prediction/reuse run.*
 
@@ -275,10 +275,10 @@ Purchase labels, current/next values, prices, and effects are populated from the
 - Each cap is still opened once.
 - The algorithm remains nested.
 
-![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Sporecap Colony: spores in each cap.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U10-MENU.png)
+![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Sporecap Colony: spores in each cap.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U10-MENU.png)
 
 *Sporecap Colony: spores in each cap purchase-panel evidence.*
-![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U10-RUN.gif)
+![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U10-RUN.gif)
 
 *Sporecap Colony: spores in each cap prediction/reuse run.*
 
@@ -300,10 +300,10 @@ Purchase labels, current/next values, prices, and effects are populated from the
 - The learner still decrements before transfer.
 - Only compatible energy recipients can receive energy.
 
-![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Lanternleaf: stored magic charge.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U11-MENU.png)
+![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Lanternleaf: stored magic charge.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U11-MENU.png)
 
 *Lanternleaf: stored magic charge purchase-panel evidence.*
-![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U11-RUN.gif)
+![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U11-RUN.gif)
 
 *Lanternleaf: stored magic charge prediction/reuse run.*
 
@@ -325,10 +325,10 @@ Purchase labels, current/next values, prices, and effects are populated from the
 - No repeat counter is added.
 - Tighten/slow strengths remain unchanged.
 
-![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Rootsnare: root patch reach.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U12-MENU.png)
+![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Rootsnare: root patch reach.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U12-MENU.png)
 
 *Rootsnare: root patch reach purchase-panel evidence.*
-![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U12-RUN.gif)
+![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U12-RUN.gif)
 
 *Rootsnare: root patch reach prediction/reuse run.*
 
@@ -350,10 +350,10 @@ Purchase labels, current/next values, prices, and effects are populated from the
 - Focus-before-conductive stays unchanged.
 - Zap/gust meanings stay unchanged.
 
-![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Stormbloom: spark bulbs.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U13-MENU.png)
+![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Stormbloom: spark bulbs.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U13-MENU.png)
 
 *Stormbloom: spark bulbs purchase-panel evidence.*
-![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U13-RUN.gif)
+![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U13-RUN.gif)
 
 *Stormbloom: spark bulbs prediction/reuse run.*
 
@@ -375,9 +375,9 @@ Purchase labels, current/next values, prices, and effects are populated from the
 - Focus-before-conductive stays unchanged.
 - Zap/gust meanings stay unchanged.
 
-![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Stormbloom: sparks in each bulb.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U14-MENU.png)
+![At 640 by 480, the purchase panel shows the named current and next value, price, and concise effect for Stormbloom: sparks in each bulb.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U14-MENU.png)
 
 *Stormbloom: sparks in each bulb purchase-panel evidence.*
-![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.0/M-U14-RUN.gif)
+![At 640 by 480, the learner's unchanged current algorithm runs after purchase so the changed named value can be compared with the prediction.](https://raw.githubusercontent.com/mrbrackebusch-code/magical-farm/main/assets/instructions/v0.1.1/M-U14-RUN.gif)
 
 *Stormbloom: sparks in each bulb prediction/reuse run.*

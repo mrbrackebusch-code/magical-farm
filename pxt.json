@@ -1,9 +1,10 @@
 {
   "name": "magical-farm",
   "description": "Magical Farm Loops: farm jobs and plant defenders powered by learner code.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "dependencies": {
-    "device": "*"
+    "device": "*",
+    "arcade-mini-menu": "github:riknoll/arcade-mini-menu#v0.1.0"
   },
   "files": [
     "main.ts",
