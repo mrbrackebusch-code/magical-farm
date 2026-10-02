@@ -1,0 +1,34 @@
+{
+  "name": "magical-farm",
+  "description": "Magical Farm Loops: farm jobs and plant defenders powered by learner code.",
+  "version": "0.1.0",
+  "dependencies": {
+    "device": "*"
+  },
+  "files": [
+    "main.ts",
+    "README.md",
+    "docs/tutorials/r01.md",
+    "docs/tutorials/r02.md",
+    "docs/tutorials/r03.md",
+    "docs/tutorials/r04.md",
+    "docs/tutorials/r05.md",
+    "docs/tutorials/r06.md",
+    "docs/tutorials/r07.md",
+    "docs/tutorials/r08.md",
+    "docs/tutorials/r09.md",
+    "docs/tutorials/r10.md",
+    "docs/tutorials/r11.md",
+    "docs/tutorials/r12.md",
+    "docs/tutorials/r13.md",
+    "docs/tutorials/r14.md",
+    "docs/tutorials/r15.md",
+    "docs/tutorials/r16.md",
+    "docs/tutorials/directory.md"
+  ],
+  "preferredEditor": "blocksprj",
+  "supportedTargets": [
+    "arcade"
+  ],
+  "testDependencies": {}
+}
