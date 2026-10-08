@@ -20,3 +20,6 @@ Environment tiles: [16x16 RPG Tileset by hilau](https://opengameart.org/content/
 
 
 Monsters: thirteen selected designs from isaiah658’s 50+ Monsters Pack 2D, CC0. Changes: deliberate shared-palette mapping and cached nearest-neighbor32px display versions of the64px source poses, with presentation-only walking, lunging and hit flashing. Editable source pixels remain retained in the authoring project. See [CREDITS.md](CREDITS.md).
+
+
+Menu and HUD frame artwork adapts Microsoft MakeCode Arcade’s stock `sprites.dialog.smallDefault` from [sprites.dialog.jres](https://github.com/microsoft/pxt-arcade/blob/master/libs/device/sprites.dialog.jres), Microsoft Corporation and contributors, MIT. Changes: exact palette-slot substitutions for a dark brown interior, brown border and retained tan accents; source pixel geometry and transparent rounded corners preserved. Rendered with the existing pinned Arcade Mini Menu extension. See LICENSES/MakeCode-Arcade-MIT.txt.

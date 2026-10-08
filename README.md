@@ -20455,48 +20455,152 @@ return result
 }
 }
 
+// SUPPLIED SOURCE: ui-theme.ts
+// Conserve usage: one cached stock frame; pinned Mini Menu draws every surface.
+// Microsoft pxt-arcade libs/device/sprites.dialog.jres: sprites.dialog.smallDefault.
+// Exact 24x24 pixels and transparent corners; only 1->12, 11->4 (13/0 unchanged).
+namespace farmUiTheme {
+const FRAME = img`
+004444444444444444444400
+04dccccccccccccccccccd40
+4dcd4444444444444444dcd4
+4cd444444444444444444dc4
+4c4dccccccccccccccccd4c4
+4c4cccccccccccccccccc4c4
+4c4cccccccccccccccccc4c4
+4c4cccccccccccccccccc4c4
+4c4cccccccccccccccccc4c4
+4c4cccccccccccccccccc4c4
+4c4cccccccccccccccccc4c4
+4c4cccccccccccccccccc4c4
+4c4cccccccccccccccccc4c4
+4c4cccccccccccccccccc4c4
+4c4cccccccccccccccccc4c4
+4c4cccccccccccccccccc4c4
+4c4cccccccccccccccccc4c4
+4c4cccccccccccccccccc4c4
+4c4cccccccccccccccccc4c4
+4c4dccccccccccccccccd4c4
+4dc444444444444444444cd4
+44dccccccccccccccccccd44
+044444444444444444444440
+004444444444444444444400
+`
+export const font = image.scaledFont(image.font8, 2)
+export const maxWidth = 440
+// Frame inset16 + menu padding8 + item padding12 + native scrollbar8.
+export const textColumns = Math.floor((maxWidth - 44) / font.charWidth)
+
+export function applyFont(item: miniMenu.MenuItem, small: boolean = false): void {
+item._font = small ? image.font8 : font
+item._isDirty = true
+}
+
+export function create(inert: boolean = false): miniMenu.MenuSprite {
+let surface = new miniMenu.MenuSprite()
+surface.setButtonEventsEnabled(false)
+surface.setFlag(SpriteFlag.Ghost, true)
+surface.setFlag(SpriteFlag.RelativeToCamera, true)
+surface.menuStyle.columns = 1
+surface.menuStyle.rows = 0
+surface.menuStyle.disabledItemsSelectable = false
+surface.menuStyle.backgroundColor = 12
+surface.menuStyle.borderColor = 0
+surface.menuStyle.border = 0
+surface.menuStyle.padding = miniMenu.createBorderBox(4, 4, 4, 4)
+surface.menuStyle.scrollColor = inert ? 0 : 13
+surface.setFrame(FRAME)
+surface.setStyleProperty(miniMenu.StyleKind.All, miniMenu.StyleProperty.Foreground, 1)
+surface.setStyleProperty(miniMenu.StyleKind.All, miniMenu.StyleProperty.Background, 12)
+surface.setStyleProperty(miniMenu.StyleKind.All, miniMenu.StyleProperty.Border, 0)
+surface.setStyleProperty(miniMenu.StyleKind.All, miniMenu.StyleProperty.Margin, 0)
+surface.setStyleProperty(miniMenu.StyleKind.All, miniMenu.StyleProperty.Padding, miniMenu.createBorderBox(6, 2, 6, 2))
+surface.setStyleProperty(miniMenu.StyleKind.All, miniMenu.StyleProperty.IconTextSpacing, 8)
+surface.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, inert ? 12 : 13)
+surface.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Foreground, inert ? 1 : 12)
+surface.setStyleProperty(miniMenu.StyleKind.Title, miniMenu.StyleProperty.Foreground, 13)
+surface.setStyleProperty(miniMenu.StyleKind.Title, miniMenu.StyleProperty.Alignment, miniMenu.Alignment.Center)
+surface.setStyleProperty(miniMenu.StyleKind.Title, miniMenu.StyleProperty.Padding, miniMenu.createBorderBox(6, 2, 6, 6))
+return surface
+}
+
+// Readable single-column contents. Native getHeight/getWidth omit the title;
+// include it explicitly before imposing viewport limits and centering.
+export function naturalHeight(surface: miniMenu.MenuSprite): number {
+let height = 24
+if (surface.title) height += surface.title.getHeight(surface.titleStyle)
+for (let i = 0; i < surface.items.length; i++) {
+let style = surface.items[i].isDisabled() ? surface.disabledStyle : surface.defaultStyle
+height += surface.items[i].getHeight(style)
+}
+return height
+}
+
+export function fit(surface: miniMenu.MenuSprite, limitHeight: number = 336): void {
+let width = surface.title ? surface.title.getWidth(surface.titleStyle) : 0
+for (let i = 0; i < surface.items.length; i++) {
+let style = surface.items[i].isDisabled() ? surface.disabledStyle : surface.defaultStyle
+width = Math.max(width, surface.items[i].getWidth(style))
+}
+width += 24 + (surface.menuStyle.scrollColor ? 8 : 0)
+surface.setDimensions(Math.min(maxWidth, width), Math.min(limitHeight, naturalHeight(surface)))
+surface.setPosition(screen.width / 2, screen.height / 2)
+}
+
+export function wrap(text: string, columns: number): string[] {
+let lines: string[] = []
+if (!text) return lines
+let rest = text
+while (rest.length > columns) {
+let cut = columns
+while (cut > 0 && rest.charAt(cut) != " ") cut--
+if (cut == 0) cut = columns
+lines.push(rest.substr(0, cut))
+rest = rest.substr(cut)
+while (rest.length && rest.charAt(0) == " ") rest = rest.substr(1)
+}
+if (rest.length) lines.push(rest)
+return lines
+}
+}
+
 // SUPPLIED SOURCE: hud.ts
-// Conserve usage: reuse the pinned Mini Menu renderer and its cached text/layout.
-// Presentation only: never owns info.life/score, controller events or game over.
+// Conserve usage: reuse the shared stock frame, text and measured layout.
+// Presentation only: World owns HP/gold, controller events, timers and saves.
 namespace farmHud {
 let surface: miniMenu.MenuSprite = null
 let rows: miniMenu.MenuItem[] = []
 let lastHp = -1
 let lastGold = -1
 let lastNext = ""
+let noticeSurface: miniMenu.MenuSprite = null
+let lastNotice = ""
 
 export function start(): void {
 if (surface) return
-surface = new miniMenu.MenuSprite()
-surface.setButtonEventsEnabled(false)
-surface.setFlag(SpriteFlag.Ghost, true)
-surface.setFlag(SpriteFlag.RelativeToCamera, true)
+surface = farmUiTheme.create(true)
 surface.z = 20000
-surface.menuStyle.columns = 1
-surface.menuStyle.rows = 0
-surface.menuStyle.disabledItemsSelectable = false
-surface.menuStyle.backgroundColor = 1
-surface.menuStyle.borderColor = 12
-surface.menuStyle.border = miniMenu.createBorderBox(0, 0, 0, 1)
-surface.menuStyle.padding = miniMenu.createBorderBox(6, 2, 6, 2)
-surface.setStyleProperty(miniMenu.StyleKind.All, miniMenu.StyleProperty.Foreground, 15)
-surface.setStyleProperty(miniMenu.StyleKind.All, miniMenu.StyleProperty.Background, 1)
-surface.setStyleProperty(miniMenu.StyleKind.All, miniMenu.StyleProperty.Padding, miniMenu.createBorderBox(2, 2, 2, 2))
-for (let i = 0; i < 3; i++) rows.push(miniMenu.createMenuItem(" ", null, true))
+// Top-edge text uses the native8px font and compact vertical padding.
+surface.setStyleProperty(miniMenu.StyleKind.All, miniMenu.StyleProperty.Padding, miniMenu.createBorderBox(6, 1, 6, 1))
+rows.push(miniMenu.createMenuItem(" ", null, true))
+farmUiTheme.applyFont(rows[0], true)
 surface.setMenuItems(rows)
-surface.setDimensions(screen.width, 42)
-surface.setPosition(screen.width / 2, 21)
+positionHud()
 surface.setFlag(SpriteFlag.Invisible, true)
+}
+
+function positionHud(): void {
+// Include all wrapped guidance; stable values do not resize each frame.
+let height = farmUiTheme.naturalHeight(surface)
+surface.setDimensions(screen.width, height)
+surface.setPosition(screen.width / 2, height / 2)
 }
 
 function text(row: number, value: string): void {
 rows[row].setText(value.length ? value : " ")
-rows[row]._font = image.font8
-rows[row]._isDirty = true
+farmUiTheme.applyFont(rows[row], true)
 }
 
-// World supplies earned state and current guidance. Stable values do not
-// allocate strings, images or menu items each update. Menu content is inert.
 export function update(hp: number, gold: number, next: string, visible: boolean): void {
 if (!surface) start()
 surface.setFlag(SpriteFlag.Invisible, !visible)
@@ -20507,19 +20611,42 @@ text(0, "HP " + hp + "     GOLD " + gold)
 }
 if (lastNext != next) {
 lastNext = next
-let message = next.length ? "Next: " + next : ""
-let capacity = Math.floor((screen.width - 16) / image.font8.charWidth)
-let split = Math.min(message.length, capacity)
-if (message.length > capacity) {
-let space = -1
-for (let i = 0; i < capacity; i++) if (message.charAt(i) == " ") space = i
-if (space > 0) split = space
+// Only changed guidance rebuilds these cached rows. No truncation.
+let lines = farmUiTheme.wrap(next.length ? "Next: " + next : "", Math.floor((screen.width - 36) / image.font8.charWidth))
+let updated: miniMenu.MenuItem[] = [rows[0]]
+for (let i = 0; i < lines.length; i++) {
+let row = miniMenu.createMenuItem(lines[i], null, true)
+farmUiTheme.applyFont(row, true)
+updated.push(row)
 }
-text(1, message.substr(0, split))
-let remainder = split
-while (remainder < message.length && message.charAt(remainder) == " ") remainder++
-text(2, message.substr(remainder))
+rows = updated
+surface.setMenuItems(rows)
+positionHud()
 }
+}
+
+// World supplies visibility/expiry. Cached notice rows and frame are reused
+// while the message is unchanged, including every ordinary update frame.
+export function notice(message: string, visible: boolean): void {
+if (!noticeSurface && !message) return
+if (!noticeSurface) {
+noticeSurface = farmUiTheme.create(true)
+noticeSurface.z = 20001
+}
+if (message && message != lastNotice) {
+lastNotice = message
+let lines = farmUiTheme.wrap(message, Math.floor((farmUiTheme.maxWidth - 36) / image.font8.charWidth))
+let items: miniMenu.MenuItem[] = []
+for (let i = 0; i < lines.length; i++) {
+let row = miniMenu.createMenuItem(lines[i], null, true)
+farmUiTheme.applyFont(row, true)
+items.push(row)
+}
+noticeSurface.setMenuItems(items)
+farmUiTheme.fit(noticeSurface)
+noticeSurface.setPosition(screen.width / 2, screen.height - noticeSurface.height / 2 - 12)
+}
+noticeSurface.setFlag(SpriteFlag.Invisible, !visible)
 }
 }
 
@@ -41194,13 +41321,8 @@ const VIEWPORT_WIDTH = 480
 const VIEWPORT_HEIGHT = 360
 const INTERACTION_RANGE = 28
 const INTERACTION_RANGE2 = INTERACTION_RANGE * INTERACTION_RANGE
-const MENU_X = 20
-const MENU_Y = 24
-const MENU_WIDTH = 440
-const MENU_HEIGHT = 312
-const MENU_FONT = image.scaledFont(image.font8, 2)
-// Width minus menu border/padding, pinned scroll indicator, item padding.
-const MENU_TEXT_COLUMNS = Math.floor((MENU_WIDTH - 6 - 24 - 8 - 20) / MENU_FONT.charWidth)
+const MENU_FONT = farmUiTheme.font
+const MENU_TEXT_COLUMNS = farmUiTheme.textColumns
 const MENU_LAYER = 30000
 const RECOVERY_NOTICE_MS = 5000
 const EXIT_TRIGGER_RANGE = 16
@@ -41680,32 +41802,13 @@ function createMenuSurface(title: string, items: miniMenu.MenuItem[]): miniMenu.
 // This component never owns controller events: World routes each press
 // once, including the A press that opens a nested screen. It is a Sprite,
 // so production/active-play/domain updates keep running behind it.
-let surface = new miniMenu.MenuSprite()
-surface.setButtonEventsEnabled(false)
-surface.setFlag(SpriteFlag.RelativeToCamera, true)
+let surface = farmUiTheme.create()
 surface.z = MENU_LAYER
-surface.menuStyle.columns = 1
-surface.menuStyle.rows = 0
-surface.menuStyle.disabledItemsSelectable = false
-surface.menuStyle.backgroundColor = 1
-surface.menuStyle.borderColor = 7
-surface.menuStyle.border = miniMenu.createBorderBox(3, 3, 3, 3)
-surface.menuStyle.padding = miniMenu.createBorderBox(12, 8, 12, 8)
-surface.menuStyle.scrollColor = 7
-surface.setStyleProperty(miniMenu.StyleKind.All, miniMenu.StyleProperty.Foreground, 15)
-surface.setStyleProperty(miniMenu.StyleKind.All, miniMenu.StyleProperty.Background, 1)
-surface.setStyleProperty(miniMenu.StyleKind.All, miniMenu.StyleProperty.Padding, miniMenu.createBorderBox(10, 7, 10, 7))
-surface.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 7)
-surface.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Foreground, 15)
-surface.setStyleProperty(miniMenu.StyleKind.Disabled, miniMenu.StyleProperty.Padding, miniMenu.createBorderBox(10, 4, 10, 4))
-surface.setStyleProperty(miniMenu.StyleKind.Title, miniMenu.StyleProperty.Foreground, 15)
-surface.setStyleProperty(miniMenu.StyleKind.Title, miniMenu.StyleProperty.Alignment, miniMenu.Alignment.Center)
 surface.setTitle(title)
 applyMenuFont(surface.title)
 for (let i = 0; i < items.length; i++) applyMenuFont(items[i])
 surface.setMenuItems(items)
-surface.setDimensions(MENU_WIDTH, MENU_HEIGHT)
-surface.setPosition(MENU_X + MENU_WIDTH / 2, MENU_Y + MENU_HEIGHT / 2)
+farmUiTheme.fit(surface)
 return surface
 }
 
@@ -41772,11 +41875,8 @@ if (!farmAvatar.saved()) openGreeting()
 }
 else chooseSkinTone(choice)
 }, icons)
-// Show all six portraits together on the existing 640x480 screen.
-if (menuSurface) {
-menuSurface.setDimensions(MENU_WIDTH, Math.min(312, screen.height - 40))
-menuSurface.setPosition(screen.width / 2, screen.height / 2)
-}
+// Six 40px portraits + compact padding, controls, title and stock frame
+// total332px: all six fit together within the336px viewport allowance.
 }
 
 function chooseSkinTone(character: number): void {
@@ -42240,9 +42340,9 @@ resetSurface = createMenuSurface("MAGICAL FARM SAVE DELETED", items)
 // An all-disabled MenuSprite retains an internal index. Give its
 // selected style the same informational appearance, without an action
 // highlight that could imply the restart instruction is dismissible.
-resetSurface.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Foreground, 15)
-resetSurface.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 1)
-resetSurface.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Padding, miniMenu.createBorderBox(10, 4, 10, 4))
+resetSurface.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Foreground, 1)
+resetSurface.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Background, 12)
+resetSurface.setStyleProperty(miniMenu.StyleKind.Selected, miniMenu.StyleProperty.Padding, miniMenu.createBorderBox(6, 2, 6, 2))
 }
 
 function openResetFlow(): void {
@@ -42677,14 +42777,11 @@ farmHud.update(playerHp, currentProgress.gold, nextInstruction, !menuOpen)
 }
 
 function drawNotice(): void {
-if (!noticeText) return
-if (control.millis() >= noticeUntil) {
+if (noticeText && control.millis() >= noticeUntil) {
 noticeText = ""
 noticeUntil = 0
-return
 }
-screen.fillRect(60, VIEWPORT_HEIGHT - 46, VIEWPORT_WIDTH - 120, 28, 1)
-screen.printCenter(noticeText, VIEWPORT_HEIGHT - 38, 15, image.font8)
+farmHud.notice(noticeText, !!noticeText && !menuOpen && !resetPendingRestart)
 }
 
 function drawWorldUi(): void {
