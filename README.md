@@ -32686,8 +32686,9 @@ let cropDue: number[] = []
 // when physical preparation data is needed by combat.
 let cropMeta: number[] = []
 
-// A1 production uniquely replays the CURRENT learner planting/watering
-// callbacks after harvest/expansion. One automatic attempt is made per
+// New A1 expansion plots replay the CURRENT learner planting/watering
+// callbacks. Harvested crops use independent normal regrowth timers.
+// One automatic expansion attempt is made per
 // active-area session; wrong/missing current code leaves production empty
 // until the learner edits/restarts or revisits.
 let a1RegrowAttempted = false
@@ -33345,19 +33346,10 @@ return true
 
 cropHp[slot] = 0
 cropDue[slot] = 0
-if (activeArea == 1) {
-// A1 intentionally reuses the CURRENT planting/watering callbacks.
-// EMPTY means this active production slot is waiting for that pass.
-cropState[slot] = CROP_EMPTY
-if (localSlot <= a1PlotState.length) a1PlotState[localSlot - 1] = 0
-a1RegrowAttempted = false
-} else {
 setSlotRegrowing(activeArea, localSlot)
-}
 refreshActiveCrops()
 farmWorld.checkpoint("harvest")
 farmWorld.notice("HARVESTED " + cropName(crop) + " +1. SELL HARVEST AT HOME.")
-maybeStartA1Regrow()
 return true
 }
 
@@ -33608,6 +33600,18 @@ for (let area = 1; area <= 12; area++) {
 if (progress.cleared.length <= area || !progress.cleared[area]) continue
 let active = activeCountForArea(area)
 let base = baseCountForArea(area)
+// Older saves left harvested starter crops EMPTY while replaying
+// the helpers. These already-earned base crops now regrow normally.
+if (area == 1) {
+for (let local = 1; local <= base; local++) {
+let slot = globalSlot(area, local)
+if (cropState[slot] == CROP_EMPTY) {
+setSlotRegrowing(area, local)
+if (local <= a1PlotState.length) a1PlotState[local - 1] = 2
+changed = true
+}
+}
+}
 for (let local = base + 1; local <= active; local++) {
 let slot = globalSlot(area, local)
 if (slot <= 0 || cropState[slot] != CROP_EMPTY) continue
@@ -33692,7 +33696,7 @@ if (activeArea != 1) return false
 let progress = farmWorld.progress()
 if (!progress || !progress.cleared || progress.cleared.length <= 1 || !progress.cleared[1]) return false
 let active = activeCountForArea(1)
-for (let local = 1; local <= active; local++) {
+for (let local = baseCountForArea(1) + 1; local <= active; local++) {
 let slot = globalSlot(1, local)
 if (cropState[slot] == CROP_EMPTY) return true
 }
@@ -42138,10 +42142,12 @@ let dx = object.x - currentPlayer.x
 let dy = object.y - currentPlayer.y
 let distance2 = dx * dx + dy * dy
 if (distance2 > INTERACTION_RANGE2 || distance2 > bestDistance2) continue
-// Several authored jobs and harvests share one soil tile. A ripe
-// crop wins that exact tie; its work station remains usable otherwise.
+// Jobs and harvests can share a soil tile. Production interactions
+// stay on the crop after harvest, so repeated A cannot restart a job.
 if (distance2 == bestDistance2 && !(object.kind == farmTypes.ObjectKind.Harvest
-&& farmTasks.harvestReady(object.arg) && best && best.kind != farmTypes.ObjectKind.Harvest)) continue
+&& (farmTasks.harvestReady(object.arg)
+|| currentProgress.phase[currentProgress.area] == farmTypes.Phase.Production)
+&& best && best.kind != farmTypes.ObjectKind.Harvest)) continue
 // Overlap is always eligible. Otherwise the object center must be in
 // the player's current half-plane, not merely nearby behind them.
 if (distance2 > 4) {
