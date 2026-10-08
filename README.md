@@ -6,7 +6,9 @@ Your farm has work to do, and your defenders need programs of their own. You wil
 
 Move with the arrow keys. Face a station or character and press **A** to interact or choose a menu option. Press **B** to use your blade outside a menu, or go back while a menu is open. Use the arrow keys to move through menus. Play in fullscreen at **640 × 480** so the farm and its instructions fit on screen.
 
-On your first visit, you start at the home hub. Use the greeting menu to choose your character and skin tone. Follow the **PLOT 1** sign, face its travel marker, and press **A** to reach **A1 — Starter Beds**. On later visits, choose **CONTINUE** or **CHANGE APPEARANCE**; changing your appearance keeps your earned progress.
+On your first visit, you start at the home hub. Use the greeting menu to choose your character and skin tone. Find the soil bed marked **1**, face it, and press **A** to reach **A1 — Starter Beds**. Arrows mark usable exits; stone closes routes to areas you have not earned yet. On later visits, choose **CONTINUE** or **CHANGE APPEARANCE**; changing your appearance keeps your earned progress.
+
+At the hub, face the shop or armory door and press **A** to enter. Inside, walk up to a counter or weapon stand and press **A** to open its menu. Walk through the bottom doorway to return to the hub.
 
 In A1, walk to the **Plant** and **Water** stations just below the Starter Beds. Face a station and press **A** to run its Plant or Water job. Open the first Recipe for the code that controls those jobs:
 
@@ -108,6 +110,9 @@ export class Mask { slot: number = 0; kind: number = 0; radius: number = 0; tile
 export class Layout {
 constructor() {}
 area: number = 0; width: number = 0; height: number = 0;
+// Owner revision2026-10-08: transient Hub room, never a saved area.
+// 0=outside,1=shop,2=armory; learner interfaces and save IDs unchanged.
+interior: number = 0;
 entry: Point = null; ground: number[] = []; walls: number[] = [];
 objects: WorldObject[] = []; cropTiles: number[] = [];
 // Authored farming work anchors; production crop IDs remain separate.
@@ -19134,7 +19139,10 @@ let cell = y * layout.width + x
 let ground = layout.ground[cell]
 if (ground == 12) return "fence"
 if (ground == 2) return "path"
-if (ground == 3) return "cliff"
+if (ground == 3) {
+if (layout.interior > 0) return x == 0 || y == 0 || x == layout.width - 1 || y == layout.height - 1 ? "room.wall" : "room.counter"
+return "cliff"
+}
 if (ground == 4) return "soil"
 if (ground == 5) return "soil.dry"
 if (ground == 6) return "soil.wet"
@@ -19152,7 +19160,21 @@ function terrain(family: string, variant: number): Image {
 let key = family + "." + variant
 for (let i = 0; i < terrainKeys.length; i++) if (terrainKeys[i] == key) return terrainImages[i]
 let result: Image = null
-if (family == "fence") {
+if (family == "room.wall") {
+// Exact bare white/tan wall pane from the approved source house.
+result = image.create(16, 16)
+result.drawImage(farmWorldArt.object("house"), -8, -61)
+} else if (family == "room.counter") {
+// Source floor planks with a thin black/brown furniture rim only
+// on the platform's outside edges. This cache is shared immutable.
+result = farmWorldArt.tile("floor", 4).clone()
+let row = Math.floor(variant / 3)
+let col = variant % 3
+if (row == 0) { result.fillRect(0, 0, 16, 1, 15); result.fillRect(1, 1, 14, 1, 12) }
+if (row == 2) { result.fillRect(0, 15, 16, 1, 15); result.fillRect(1, 14, 14, 1, 12) }
+if (col == 0) { result.fillRect(0, 0, 1, 16, 15); result.fillRect(1, 1, 1, 14, 12) }
+if (col == 2) { result.fillRect(15, 0, 1, 16, 15); result.fillRect(14, 1, 1, 14, 12) }
+} else if (family == "fence") {
 result = farmWorldArt.tile("grass", 4).clone()
 let source = farmWorldArt.object("fence.horizontal")
 if (variant == 1) {
@@ -19169,7 +19191,7 @@ return result
 }
 
 function variant(layout: farmTypes.Layout, family: string, x: number, y: number): number {
-if (family == "grass" || family == "floor" || family == "cliff") return 4
+if (family == "grass" || family == "floor" || family == "cliff" || family == "room.wall" || (family == "soil" && layout.area == 0)) return 4
 let north = material(layout, x, y - 1) == family
 let south = material(layout, x, y + 1) == family
 let west = material(layout, x - 1, y) == family
@@ -19183,8 +19205,20 @@ let col = !west ? 0 : (!east ? 2 : 1)
 return row * 3 + col
 }
 
+export function blockedExitCells(layout: farmTypes.Layout, progress: farmTypes.Progress): number[] {
+let result: number[] = []
+for (let i = 0; i < layout.objects.length; i++) {
+let o = layout.objects[i]
+if (o.kind != farmTypes.ObjectKind.Exit || o.arg == 0 || progress.unlocked[o.arg]) continue
+let corridor = farmLayout.exitCells(layout, o)
+for (let j = 0; j < corridor.length; j++) if (result.indexOf(corridor[j]) < 0) result.push(corridor[j])
+}
+return result
+}
+
 export function render(layout: farmTypes.Layout, progress: farmTypes.Progress): void {
 let count = layout.width * layout.height
+let blocked = blockedExitCells(layout, progress)
 let data = control.createBuffer(4 + count)
 data.setNumber(NumberFormat.UInt16LE, 0, layout.width)
 data.setNumber(NumberFormat.UInt16LE, 2, layout.height)
@@ -19198,8 +19232,9 @@ bank.push(image.create(16, 16))
 bank[14].drawTransparentImage(farmArt.frame("object.barrier.closed", 0), -8, -8)
 for (let y = 0; y < layout.height; y++) {
 for (let x = 0; x < layout.width; x++) {
-let family = material(layout, x, y)
-let selected = variant(layout, family, x, y)
+let closed = blocked.indexOf(y * layout.width + x) >= 0
+let family = closed ? "cliff" : material(layout, x, y)
+let selected = closed ? 4 : variant(layout, family, x, y)
 let key = family + "." + selected
 let index = -1
 for (let i = 16; i < keys.length; i++) if (keys[i] == key) index = i
@@ -19214,12 +19249,13 @@ data.setUint8(4 + y * layout.width + x, index)
 for (let i = 0; i < layout.objects.length; i++) {
 let object = layout.objects[i]
 if (object.kind != farmTypes.ObjectKind.Barrier || progress.unlocked[object.arg]) continue
-data.setUint8(4 + Math.floor(object.y / 16) * layout.width + Math.floor(object.x / 16), 14)
+let cell = Math.floor(object.y / 16) * layout.width + Math.floor(object.x / 16)
+if (blocked.indexOf(cell) < 0) data.setUint8(4 + cell, 14)
 }
 tiles.setCurrentTilemap(tiles.createTilemap(data, image.create(layout.width, layout.height), bank, TileScale.Sixteen))
 // Exact existing wall geometry, plus the same locked barrier cells.
 for (let y = 0; y < layout.height; y++) {
-for (let x = 0; x < layout.width; x++) if (layout.walls[y * layout.width + x]) tiles.setWallAt(tiles.getTileLocation(x, y), true)
+for (let x = 0; x < layout.width; x++) if (layout.walls[y * layout.width + x] || blocked.indexOf(y * layout.width + x) >= 0) tiles.setWallAt(tiles.getTileLocation(x, y), true)
 }
 for (let i = 0; i < layout.objects.length; i++) {
 let object = layout.objects[i]
@@ -19253,15 +19289,75 @@ if (Math.abs(tile % layout.width - x) < 4 && Math.abs(Math.idiv(tile, layout.wid
 return true
 }
 
-export function decorations(layout: farmTypes.Layout, kind: number): Sprite[] {
+function labelSprite(label: string, x: number, y: number, kind: number): Sprite {
+let sign = image.create(label.length * 6 + 4, 12)
+sign.fill(1)
+sign.print(label, 2, 2, 15, image.font8)
+let sprite = sprites.create(sign, kind)
+sprite.setFlag(SpriteFlag.Ghost, true)
+sprite.setPosition(x, y)
+sprite.z = 6
+return sprite
+}
+
+export function decorations(layout: farmTypes.Layout, kind: number, progress: farmTypes.Progress = null): Sprite[] {
 let result: Sprite[] = []
+if (layout.interior > 0) {
+let title = layout.interior == 1 ? "FARM SHOP" : "ARMORY"
+result.push(labelSprite(title, 328, 64, kind))
+for (let i = 0; i < layout.objects.length; i++) {
+let o = layout.objects[i]
+if (o.kind == farmTypes.ObjectKind.Exit) continue
+let cx = o.x
+// The native source-plank platform is the shop counter.
+// Armory racks retain the approved source mesh above the wood.
+if (layout.interior == 2) {
+let furniture = sprites.create(farmWorldArt.object("window.mesh"), kind)
+furniture.setFlag(SpriteFlag.Ghost, true)
+furniture.setPosition(cx, 168)
+furniture.z = 3
+result.push(furniture)
+}
+let label = ""
+if (layout.interior == 1) {
+label = o.arg == 0 ? "EXPAND PLOTS" : (o.arg == 1 ? "PLANT UPGRADES" : "APPEARANCE")
+} else {
+let key = o.arg == 0 ? "weapon.gardenblade" : (o.arg == 1 ? "weapon.longheavy" : "weapon.shortquick")
+let weapon = sprites.create(farmArt.frame(key, 0), kind)
+weapon.setFlag(SpriteFlag.Ghost, true)
+weapon.setPosition(cx, 168)
+weapon.z = 5
+result.push(weapon)
+label = o.arg == 0 ? "GARDEN BLADE" : (o.arg == 1 ? "LONG HEAVY" : "SHORT QUICK")
+}
+result.push(labelSprite(label, cx, 240, kind))
+}
+let glass = sprites.create(farmWorldArt.object("window.glass"), kind)
+glass.setFlag(SpriteFlag.Ghost, true)
+glass.setPosition(328, 104)
+glass.z = 3
+result.push(glass)
+result.push(labelSprite("EXIT", 328, 424, kind))
+return result
+}
+// Direction signs identify only usable authored perimeter exits.
+for (let i = 0; i < layout.objects.length; i++) {
+let o = layout.objects[i]
+if (o.kind != farmTypes.ObjectKind.Exit || (o.arg > 0 && (!progress || !progress.unlocked[o.arg]))) continue
+let cx = Math.floor(o.x / 16)
+let cy = Math.floor(o.y / 16)
+let label = cx == 0 ? "< EXIT" : (cx == layout.width - 1 ? "EXIT >" : (cy == 0 ? "^ EXIT" : "EXIT v"))
+let px = o.x + (cx == 0 ? 56 : (cx == layout.width - 1 ? -56 : 0))
+let py = o.y + (cy == 0 ? 56 : (cy == layout.height - 1 ? -56 : 0))
+result.push(labelSprite(label, px, py, kind))
+}
 // Text signs are presentation only, tied to the unchanged interaction
 // IDs. Their Ghost sprites do not supply any wall or gameplay behavior.
 if (layout.area == 0) {
 for (let i = 0; i < layout.objects.length; i++) {
 let object = layout.objects[i]
 let label = ""
-if (object.kind == farmTypes.ObjectKind.Travel) label = "PLOT " + object.arg
+if (object.kind == farmTypes.ObjectKind.Travel) label = "" + object.arg
 if (object.kind == farmTypes.ObjectKind.Shop) label = "SHOP / UPGRADES"
 if (object.kind == farmTypes.ObjectKind.Armory) label = "ARMORY"
 if (object.kind == farmTypes.ObjectKind.SellBox) label = "SELL HARVEST"
@@ -19271,7 +19367,7 @@ sign.fill(1)
 sign.print(label, 2, 2, 15, image.font8)
 let sprite = sprites.create(sign, kind)
 sprite.setFlag(SpriteFlag.Ghost, true)
-sprite.setPosition(object.x, object.y + (object.kind == farmTypes.ObjectKind.Travel ? -20 : 20))
+sprite.setPosition(object.x, object.y + (object.kind == farmTypes.ObjectKind.Travel ? 0 : 20))
 sprite.z = 6
 result.push(sprite)
 }
@@ -30072,10 +30168,14 @@ connect(layout, safe, y * layout.width + x)
 for (let y = 0; y < layout.height; y++) {
 for (let x = 0; x < layout.width; x++) {
 let cell = y * layout.width + x
-// Outside fence gates protect the exact authored exit corridors.
-if ((x == 0 || y == 0 || x == layout.width - 1 || y == layout.height - 1) && !safe[cell]) {
-layout.walls[cell] = 1
-layout.ground[cell] = 12
+// Only authored Exit corridors may interrupt the outer stone wall.
+if (x == 0 || y == 0 || x == layout.width - 1 || y == layout.height - 1) {
+let gate = false
+for (let i = 0; i < layout.objects.length; i++) {
+if (layout.objects[i].kind == farmTypes.ObjectKind.Exit && exitCells(layout, layout.objects[i]).indexOf(cell) >= 0) gate = true
+}
+layout.walls[cell] = gate ? 0 : 1
+layout.ground[cell] = gate ? 2 : 3
 }
 // Existing water becomes a real wall only away from all active
 // crop/task/defender/route access. Protected water is a crossing.
@@ -30086,6 +30186,17 @@ else { layout.ground[cell] = 2; layout.walls[cell] = 0 }
 }
 }
 if (layout.area == 0) {
+// Source soil beds remain flat and traversable; paths between beds
+// retain one-cell gaps and the original travel interaction anchors.
+for (let i = 0; i < layout.objects.length; i++) {
+let o = layout.objects[i]
+if (o.kind != farmTypes.ObjectKind.Travel) continue
+let cx = Math.floor(o.x / 16)
+let cy = Math.floor(o.y / 16)
+for (let y = cy - 1; y <= cy; y++) for (let x = cx - 1; x <= cx + 1; x++) {
+layout.ground[y * layout.width + x] = 4
+}
+}
 // Native footprints beneath each building; front interaction cells
 // remain walkable. Sprites are visual only, never collision owners.
 for (let i = 0; i < layout.objects.length; i++) {
@@ -30117,6 +30228,52 @@ if (!safe[cell] && !layout.walls[cell]) { layout.ground[cell] = 12; layout.walls
 }
 }
 return layout
+}
+
+// Five-cell gates support the existing player body. Shared by presentation
+// and host geometry so locked corridor appearance and collision agree.
+export function exitCells(layout: farmTypes.Layout, exit: farmTypes.WorldObject): number[] {
+let cx = Math.floor(exit.x / 16)
+let cy = Math.floor(exit.y / 16)
+let distances = [cx, layout.width - 1 - cx, cy, layout.height - 1 - cy]
+let side = 0
+for (let i = 1; i < 4; i++) if (distances[i] < distances[side]) side = i
+let cells: number[] = []
+for (let depth = 0; depth < 4; depth++) for (let across = -2; across <= 2; across++) {
+let x = side == 0 ? depth : (side == 1 ? layout.width - 1 - depth : cx + across)
+let y = side == 2 ? depth : (side == 3 ? layout.height - 1 - depth : cy + across)
+if (x >= 0 && y >= 0 && x < layout.width && y < layout.height) cells.push(y * layout.width + x)
+}
+return cells
+}
+
+export function interior(room: number): farmTypes.Layout {
+let l = new farmTypes.Layout()
+l.area = 0
+l.interior = room == 2 ? 2 : 1
+l.width = 40
+l.height = 30
+l.entry = point(328, 392)
+for (let y = 0; y < l.height; y++) for (let x = 0; x < l.width; x++) {
+let wall = x == 0 || x == 39 || y == 0 || y == 29
+// The five-cell bottom doorway is the only perimeter opening.
+if (y == 29 && x >= 18 && x <= 22) wall = false
+l.ground.push(wall ? 3 : 8)
+l.walls.push(wall ? 1 : 0)
+}
+l.objects.push(worldObject(501, farmTypes.ObjectKind.Exit, 328, 440, 0, 0))
+for (let i = 0; i < 3; i++) {
+let cx = 8 + i * 12
+l.objects.push(worldObject((l.interior == 1 ? 510 : 520) + i,
+l.interior == 1 ? farmTypes.ObjectKind.Shop : farmTypes.ObjectKind.Armory,
+cx * 16 + 8, 216, i, 0))
+// Solid source-floor counters/platforms behind each interaction.
+for (let y = 9; y <= 11; y++) for (let x = cx - 2; x <= cx + 2; x++) {
+l.walls[y * l.width + x] = 1
+l.ground[y * l.width + x] = 3
+}
+}
+return l
 }
 
 export function get(area: number): farmTypes.Layout {
@@ -39523,7 +39680,7 @@ const EXPANSION_LABEL_TIER2: string[] = ["", "SEED BUNDLE II", "", "", "", "", "
 
 const STARTING_GOLD = 0
 const STARTING_HP = 20
-const STARTING_MOVE_SPEED = 80
+const STARTING_MOVE_SPEED = 180
 const SAVE_DEBOUNCE_MS = 1000
 const NOTICE_MS = 1200
 const MAX_UPDATE_DT_MS = 100
@@ -39544,7 +39701,7 @@ const MENU_FONT = image.scaledFont(image.font8, 2)
 const MENU_TEXT_COLUMNS = Math.floor((MENU_WIDTH - 6 - 24 - 8 - 20) / MENU_FONT.charWidth)
 const MENU_LAYER = 200
 const RECOVERY_NOTICE_MS = 5000
-const EXIT_TRIGGER_RANGE = 8
+const EXIT_TRIGGER_RANGE = 16
 const EXIT_TRIGGER_RANGE2 = EXIT_TRIGGER_RANGE * EXIT_TRIGGER_RANGE
 const TRANSITION_RECOVERY_NOTICE_MS = 5000
 
@@ -39617,6 +39774,9 @@ let raidRecoveryFarm: number[] = []
 let lastUpdateMs = 0
 let lastPeriodicCheckpointClock = 0
 let pendingTransitionArea = -1
+// Local Hub rooms share the ordinary transition gate and durable area0.
+let pendingTransitionInterior = 0
+let interiorDoorObjectId = -1
 let pendingTransitionEntryObjectId = -1
 let pendingTransitionReason = ""
 let pendingTransitionStartedMs = 0
@@ -39942,9 +40102,13 @@ return ""
 
 function renderWorldObjects(source: farmTypes.Layout): void {
 clearWorldObjectSprites()
-worldObjectSprites = farmWorldView.decorations(source, WORLD_OBJECT_KIND)
+worldObjectSprites = farmWorldView.decorations(source, WORLD_OBJECT_KIND, currentProgress)
 for (let i = 0; i < source.objects.length; i++) {
 let object = source.objects[i]
+// Hub destinations are the actual source-soil beds and number badges.
+if (source.area == 0 && source.interior == 0 && object.kind == farmTypes.ObjectKind.Travel) continue
+// Interior stations are fully rendered by the room presentation.
+if (source.interior > 0 && (object.kind == farmTypes.ObjectKind.Shop || object.kind == farmTypes.ObjectKind.Armory)) continue
 let key = objectArtKey(object)
 if (!key) continue
 // Locked travel destinations are dormant; the authored floor/rune
@@ -40113,7 +40277,7 @@ return
 }
 farmAvatar.select(character, choice)
 farmAvatar.attach(currentPlayer)
-if (currentProgress && currentProgress.area == 0) notice("FOLLOW PLOT 1. A INTERACTS; B ATTACKS.")
+if (currentProgress && currentProgress.area == 0) notice("SOIL BED 1. A INTERACTS; B ATTACKS.")
 }, icons)
 }
 
@@ -40123,11 +40287,11 @@ openMenu("WELCOME BACK", ["CONTINUE", "CHANGE APPEARANCE"],
 ["Your earned progress stays. A interacts; B attacks.", "Choose a character, then a skin tone. Progress stays."],
 function (choice: number) {
 if (choice == 1) chooseCharacter()
-else if (currentProgress && currentProgress.area == 0) notice("FOLLOW PLOT 1 TO BEGIN. A INTERACTS.")
+else if (currentProgress && currentProgress.area == 0) notice("FIND SOIL BED 1. A INTERACTS.")
 })
 } else {
 openMenu("WELCOME TO MAGICAL FARM", ["CHOOSE YOUR CHARACTER"],
-["Start at home. Choose a character and skin tone, then follow PLOT 1. A interacts; B attacks."],
+["Choose a character and skin tone, then find soil bed 1. A interacts; B attacks."],
 function (choice: number) {
 if (choice >= 0) chooseCharacter()
 else openGreeting()
@@ -40530,6 +40694,18 @@ if (choice >= 0 && choice <= 2) chooseWeapon(choice)
 })
 }
 
+function openWeaponStand(weapon: number): void {
+if (!hubPurchaseAvailable() || !validWeapon(weapon)) { notice("ARMORY UNAVAILABLE"); return }
+let equipped = currentProgress.weapon == weapon
+let owned = currentProgress.weapons[weapon] == 1
+let action = equipped ? "EQUIPPED" : (owned ? "EQUIP" : "BUY AND EQUIP")
+let detail = owned ? "You own this weapon. Equipping costs no gold."
+: "PRICE: " + weaponPrice(weapon) + " GOLD. YOUR GOLD: " + currentProgress.gold
+openMenu(WEAPON_NAME[weapon], [action, "BACK"], [detail], function (choice: number) {
+if (choice == 0) chooseWeapon(weapon)
+}, [farmArt.frame(weapon == 0 ? "weapon.gardenblade" : (weapon == 1 ? "weapon.longheavy" : "weapon.shortquick"), 0), null])
+}
+
 function finishReset(): void {
 farmSave.reset()
 farmAvatar.reset()
@@ -40649,6 +40825,7 @@ return pendingTransitionArea >= 0
 
 function clearPendingTransition(): void {
 pendingTransitionArea = -1
+pendingTransitionInterior = 0
 pendingTransitionEntryObjectId = -1
 pendingTransitionReason = ""
 pendingTransitionStartedMs = 0
@@ -40668,11 +40845,12 @@ return false
 }
 
 let area = pendingTransitionArea
+let room = pendingTransitionInterior
 let entryObjectId = pendingTransitionEntryObjectId
 let reason = pendingTransitionReason
 clearPendingTransition()
 
-if (!loadRegion(area, entryObjectId)) {
+if (!loadRegion(area, entryObjectId, room)) {
 setPlayerMovement(!menuOpen)
 notice("PATH UNAVAILABLE")
 return false
@@ -40682,7 +40860,12 @@ return true
 }
 
 function requestRegionTransition(area: number, entryObjectId: number, reason: string): boolean {
+return requestSceneTransition(area, entryObjectId, reason, 0)
+}
+
+function requestSceneTransition(area: number, entryObjectId: number, reason: string, room: number): boolean {
 if (!currentProgress || !layoutAreaValid(area) || transitionPending()) return false
+if (room < 0 || room > 2 || (room > 0 && area != 0)) return false
 if (resetPendingRestart || saveBlocked || farmSave.blocked() || menuOpen) return false
 if (hasActiveRaid()) {
 notice("FINISH THE RAID FIRST")
@@ -40691,6 +40874,7 @@ return false
 if (area != 0 && !currentProgress.unlocked[area]) return false
 
 pendingTransitionArea = area
+pendingTransitionInterior = room
 pendingTransitionEntryObjectId = entryObjectId
 pendingTransitionReason = reason ? reason : "region-transition"
 pendingTransitionStartedMs = control.millis()
@@ -40716,6 +40900,15 @@ if (menuOpen || resetPendingRestart || saveBlocked || hasActiveRaid() || transit
 for (let i = 0; i < currentLayout.objects.length; i++) {
 let object = currentLayout.objects[i]
 if (!object || object.kind != farmTypes.ObjectKind.Exit) continue
+if (currentLayout.interior > 0) {
+let dx = object.x - currentPlayer.x
+let dy = object.y - currentPlayer.y
+if (dx * dx + dy * dy <= EXIT_TRIGGER_RANGE2) {
+requestSceneTransition(0, interiorDoorObjectId, "leave-building", 0)
+return
+}
+continue
+}
 if (!validDestination(object.arg)) continue
 if (object.arg != 0 && !currentProgress.unlocked[object.arg]) continue
 let dx = object.x - currentPlayer.x
@@ -40784,8 +40977,18 @@ return
 if (object.kind == farmTypes.ObjectKind.Barrier) { openBarrier(object); return }
 if (object.kind == farmTypes.ObjectKind.Travel) { travelTo(object); return }
 if (object.kind == farmTypes.ObjectKind.SellBox) { openSellBox(); return }
-if (object.kind == farmTypes.ObjectKind.Shop) { openShop(); return }
-if (object.kind == farmTypes.ObjectKind.Armory) { openArmory(); return }
+if (object.kind == farmTypes.ObjectKind.Shop) {
+if (interior() == 0) requestSceneTransition(0, object.id, "enter-shop", 1)
+else if (object.arg == 0) openExpansionShop()
+else if (object.arg == 1) openPlantUpgradeShop()
+else chooseCharacter()
+return
+}
+if (object.kind == farmTypes.ObjectKind.Armory) {
+if (interior() == 0) requestSceneTransition(0, object.id, "enter-armory", 2)
+else openWeaponStand(object.arg)
+return
+}
 if (object.kind == farmTypes.ObjectKind.Ready) { requestReady(object); return }
 if (object.kind == farmTypes.ObjectKind.Reset) { openResetFlow(); return }
 }
@@ -40869,7 +41072,13 @@ result.y = source.entry.y
 if (objectId < 0) return result
 for (let i = 0; i < source.objects.length; i++) {
 let object = source.objects[i]
-if (object.kind != farmTypes.ObjectKind.Exit || object.id != objectId) continue
+if (object.id != objectId) continue
+if (source.interior == 0 && (object.kind == farmTypes.ObjectKind.Shop || object.kind == farmTypes.ObjectKind.Armory)) {
+result.x = object.x
+result.y = object.y + TILE_SIZE * 2
+return result
+}
+if (object.kind != farmTypes.ObjectKind.Exit) continue
 result.x = object.x
 result.y = object.y
 let centerX = source.width * TILE_SIZE / 2
@@ -40892,12 +41101,13 @@ scene.cameraFollowSprite(currentPlayer)
 setPlayerMovement(!menuOpen)
 }
 
-function loadRegion(area: number, entryObjectId: number): boolean {
+function loadRegion(area: number, entryObjectId: number, room: number = 0): boolean {
 if (!layoutAreaValid(area)) return false
-let next = farmLayout.get(area)
+let next = room > 0 ? farmLayout.interior(room) : farmLayout.get(area)
 if (!validLayout(next, area)) return false
 
 clearRegion()
+interiorDoorObjectId = room > 0 ? entryObjectId : -1
 currentLayout = next
 renderGround(next)
 renderWorldObjects(next)
@@ -40975,6 +41185,10 @@ return currentPlayer
 
 export function layout(): farmTypes.Layout {
 return currentLayout
+}
+
+export function interior(): number {
+return currentLayout ? currentLayout.interior : 0
 }
 
 export function notice(message: string): void {
