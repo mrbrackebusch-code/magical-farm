@@ -12,7 +12,7 @@ At the hub, face the shop or armory door and press **A** to enter. Inside, walk 
 
 In A1, walk to the **Plant** and **Water** stations just below the Starter Beds. Face a station and press **A** to run its Plant or Water job. Open the first Recipe for the code that controls those jobs:
 
-[Open R01](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r01)
+[Open R01](#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r01)
 
 The **Next:** message names your next action and the Recipe to open when code is needed. Follow the blinking arrow above the work or practice pad, then face the pad and press **A** to run your current code.
 
@@ -36,22 +36,24 @@ farm.onWater(function (job) {
 
 Each Recipe continues in this same Magical Farm project. Your earned areas and upgrades are saved as world progress; your current program determines how each new task behaves. Recipes guide you through the code, while playing the game earns progress. You can buy upgrades at the hub; each purchase menu shows the named property and its current and next values. The hub also has a reset choice if you decide you want to start over.
 
-- **A1 — Starter Beds: First Repeats:** [Open R01](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r01)
-- **A2 — Fence & Trellis: Repeat a Whole Sequence:** [Open R02](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r02)
-- **A2 — Six-Shooter: Counted Repeat Retrieval:** [Open R03](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r03)
-- **A3 — Berry Patch: Repeat a Work Cycle:** [Open R04](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r04)
-- **A4 — Bloom Forge: Change a Value Each Time:** [Open R05](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r05)
-- **A5 — Overgrown Field: Decide Inside a Repeat:** [Open R06](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r06)
-- **A5 — Rage Orchid: First While Loop:** [Open R07](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r07)
-- **A6 — Dry Terrace: Repeat While Resource Remains:** [Open R08](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r08)
-- **A6 — Prism Bloom: If/Else:** [Open R09](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r09)
-- **A7 — Orchard Lane: Use the Loop Index:** [Open R10](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r10)
-- **A8 — Animal Meadow: Inspect, Decide, and Reuse:** [Open R11](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r11)
-- **A9 — Greenhouse Grid: Loops Inside Loops:** [Open R12](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r12)
-- **A10 — Wash House: While + If/Else Synthesis:** [Open R13](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r13)
-- **A11 — Packing Barn: Nested Work and Seal:** [Open R14](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r14)
-- **A12 — Moon Grove: Full Farm Synthesis:** [Open R15](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r15)
-- **A12 — Stormbloom Projection: Final Synthesis:** [Open R16](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r16)
+- **A1 — Starter Beds: First Repeats:** [Open R01](#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r01)
+- **A2 — Fence & Trellis: Repeat a Whole Sequence:** [Open R02](#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r02)
+- **A2 — Six-Shooter: Counted Repeat Retrieval:** [Open R03](#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r03)
+- **A3 — Berry Patch: Repeat a Work Cycle:** [Open R04](#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r04)
+- **A4 — Bloom Forge: Change a Value Each Time:** [Open R05](#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r05)
+- **A5 — Overgrown Field: Decide Inside a Repeat:** [Open R06](#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r06)
+- **A5 — Rage Orchid: First While Loop:** [Open R07](#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r07)
+- **A6 — Dry Terrace: Repeat While Resource Remains:** [Open R08](#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r08)
+- **A6 — Prism Bloom: If/Else:** [Open R09](#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r09)
+- **A7 — Orchard Lane: Use the Loop Index:** [Open R10](#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r10)
+- **A8 — Animal Meadow: Inspect, Decide, and Reuse:** [Open R11](#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r11)
+- **A9 — Greenhouse Grid: Loops Inside Loops:** [Open R12](#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r12)
+- **A10 — Wash House: While + If/Else Synthesis:** [Open R13](#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r13)
+- **A11 — Packing Barn: Nested Work and Seal:** [Open R14](#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r14)
+- **A12 — Moon Grove: Full Farm Synthesis:** [Open R15](#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r15)
+- **A12 — Stormbloom Projection: Final Synthesis:** [Open R16](#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r16)
+
+[Optional upgrade prediction and reuse](https://github.com/mrbrackebusch-code/magical-farm/blob/main/docs/optional-upgrades.md)
 
 #### ~ tutorialhint
 
@@ -68,8 +70,6 @@ farm.onWater(function (job) {
     }
 })
 ```
-
-[Optional upgrade prediction and reuse](https://github.com/mrbrackebusch-code/magical-farm/blob/main/docs/optional-upgrades.md)
 
 ```package
 arcade-mini-menu=github:riknoll/arcade-mini-menu#v0.1.0
