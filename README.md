@@ -32696,6 +32696,9 @@ const A4_CROP_HP_PER_POWER = 1
 let activeArea = 0
 let activeLayout: farmTypes.Layout = null
 let helper: Sprite = null
+let helperTeam: Sprite[] = []
+let helperFrames: Image[] = []
+let helperContext: farmTypes.Context = null
 let helperKey = ""
 let helperToken = -1
 let workPulse: Sprite = null
@@ -32829,10 +32832,10 @@ cropSpriteSlots = []
 }
 
 function destroyDomainSprites(): void {
-if (helper) {
-helper.destroy()
+for (let i = 0; i < helperTeam.length; i++) helperTeam[i].destroy()
+helperTeam = []
 helper = null
-}
+helperContext = null
 helperKey = ""
 if (workPulse) workPulse.destroy()
 workPulse = null
@@ -32931,44 +32934,89 @@ prop++
 }
 }
 
-function helperArtForTask(task: number): string {
-if (task == farmTypes.Task.Plant || task == farmTypes.Task.Greenhouse) return "helper.planter"
-if (task == farmTypes.Task.Water || task == farmTypes.Task.Irrigate) return "helper.waterer"
-if (task == farmTypes.Task.Baskets) return "helper.carrier"
-return "helper.worker"
+function ensureHelper(task: number): Sprite {
+// Tiny winged garden spirits. Cache the three immutable color variants
+// once; the team is presentation only, never three learner operations.
+if (helperFrames.length == 0) {
+let spirit = img`
+....................
+........ff..........
+.......f77f.........
+........f7f.........
+......ffffff........
+.....fe1111ef.......
+.....fe1ff1ef.......
+.fff.fe1111ef.fff...
+f111ffee11eeff111f..
+f1ee1feffffef1ee1f..
+.f1e1feeeeeef1e1f...
+..fffeeeeeeeefff....
+....fee1ee1eef......
+.....feeeeeef.......
+......feeeef........
+.......ffff.........
+......f1ff1f........
+.......f..f.........
+....................
+....................
+`
+helperFrames.push(spirit)
+let golden = spirit.clone()
+golden.replace(14, 5)
+helperFrames.push(golden)
+let violet = spirit.clone()
+violet.replace(14, 3)
+helperFrames.push(violet)
+}
+if (!helper) {
+for (let i = 0; i < 3; i++) {
+let spirit = sprites.create(helperFrames[i], HelperKind)
+spirit.setFlag(SpriteFlag.Ghost, true)
+helperTeam.push(spirit)
+}
+helper = helperTeam[0]
+}
+for (let i = 0; i < helperTeam.length; i++) helperTeam[i].setFlag(SpriteFlag.Invisible, false)
+return helper
 }
 
-function ensureHelper(task: number): Sprite {
-if (helper) {
-helper.setFlag(SpriteFlag.Invisible, false)
-return helper
+function arrangeHelperTeam(celebrate: boolean): void {
+if (!helper) return
+for (let i = 1; i < helperTeam.length; i++) {
+helperTeam[i].setPosition(helper.x + (i == 1 ? -19 : 19), helper.y + (celebrate ? -4 : 4))
+helperTeam[i].z = helper.z
 }
-// Existing authored avatar art, cached by farmAvatar; no generated dot.
-helper = sprites.create(farmAvatar.portrait(2, 1), HelperKind)
-let player = farmWorld.player()
-if (player) helper.setPosition(player.x, player.y)
-helper.setFlag(SpriteFlag.Ghost, true)
-return helper
+}
+
+function hideHelperTeam(): void {
+for (let i = 0; i < helperTeam.length; i++) helperTeam[i].setFlag(SpriteFlag.Invisible, true)
+if (workPulse) workPulse.setFlag(SpriteFlag.Invisible, true)
 }
 
 function moveHelperToPixel(context: farmTypes.Context, x: number, y: number): boolean {
 if (context.cancelled) return false
 let actor = ensureHelper(context.task)
 helperToken = context.token
+helperContext = context
 // Poof directly to this authored work target, never simulated pathfinding.
 actor.setPosition(x, y - 12)
 actor.z = y + 2
-actor.startEffect(effects.confetti, 160)
+arrangeHelperTeam(false)
+for (let i = 0; i < helperTeam.length; i++) helperTeam[i].startEffect(effects.confetti, 160)
 actor.y -= 5
+arrangeHelperTeam(true)
 pause(100)
 if (!helperCurrent(context, actor)) return false
 actor.y += 5
+arrangeHelperTeam(false)
 pause(100)
 return helperCurrent(context, actor)
 }
 
 function helperCurrent(context: farmTypes.Context, actor: Sprite): boolean {
-return !context.cancelled && context.area == activeArea && helper == actor && helperToken == context.token
+let current = !context.cancelled && context.area == activeArea && helper == actor && helperToken == context.token
+if (!current && helper == actor && helperToken == context.token) hideHelperTeam()
+return current
 }
 
 function farewellHelper(context: farmTypes.Context): void {
@@ -32979,15 +33027,17 @@ let x = actor.x
 let y = actor.y
 for (let beat = 0; beat < 3; beat++) {
 actor.setPosition(x + (beat % 2 == 0 ? 5 : -5), y - 5)
+arrangeHelperTeam(true)
 pause(90)
 if (!helperCurrent(context, actor)) return
 actor.setPosition(x, y)
+arrangeHelperTeam(false)
 pause(60)
 if (!helperCurrent(context, actor)) return
 }
-actor.startEffect(effects.confetti, 180)
+for (let i = 0; i < helperTeam.length; i++) helperTeam[i].startEffect(effects.confetti, 180)
 pause(100)
-if (helperCurrent(context, actor)) actor.setFlag(SpriteFlag.Invisible, true)
+if (helperCurrent(context, actor)) hideHelperTeam()
 }
 
 function showWorkPulse(context: farmTypes.Context): void {
@@ -33010,8 +33060,12 @@ pause(30)
 if (!helperCurrent(context, actor) || !workPulse) return
 workPulse.setFlag(SpriteFlag.Invisible, false)
 actor.y -= 3
+arrangeHelperTeam(true)
 pause(220)
-if (helperCurrent(context, actor)) actor.y += 3
+if (helperCurrent(context, actor)) {
+actor.y += 3
+arrangeHelperTeam(false)
+}
 if (workPulse) workPulse.setFlag(SpriteFlag.Invisible, true)
 }
 
@@ -33797,6 +33851,7 @@ activeLayout = null
 }
 
 export function update(dtMs: number): void {
+if (helperContext && (helperContext.cancelled || helperContext.area != activeArea)) hideHelperTeam()
 if (dtMs < 0) dtMs = 0
 if (dtMs > 100) dtMs = 100
 // Timers use the world active-play clock, not wall clock. Updating all
@@ -34698,7 +34753,7 @@ result.code = farmTypes.ResultCode.Wrong
 result.message = taskMessage(context.task) + " The visible farm state is not complete yet."
 }
 result.trace = copyNumbers(context.trace)
-if (helper && helperToken == context.token) helper.setFlag(SpriteFlag.Invisible, true)
+if (helper && helperToken == context.token) hideHelperTeam()
 farmWorld.dirtyWork()
 return result
 }
