@@ -4,15 +4,33 @@
 
 Your farm has work to do, and your defenders need programs of their own. You will build the code that responds to farm jobs and powers, then see what your current program makes happen in the world.
 
-Move with the arrow keys. Face a station or character and press **A** to interact or choose a menu option. Press **B** to use your blade outside a menu, or go back while a menu is open. Use the arrow keys to move through menus. Play in fullscreen at **640 × 480** so the farm and its instructions fit on screen.
+Move with the arrow keys. Face a station or character and press **A** to interact or choose a menu option. Press **B** to use your blade outside a menu, or go back while a menu is open. Use the arrow keys to move through menus. Play in fullscreen at **480 × 360** so the farm and its instructions fit on screen.
 
-On your first visit, you start at the home hub. Use the greeting menu to choose your character and skin tone. Find the soil bed marked **1**, face it, and press **A** to reach **A1 — Starter Beds**. Arrows mark usable exits; stone closes routes to areas you have not earned yet. On later visits, choose **CONTINUE** or **CHANGE APPEARANCE**; changing your appearance keeps your earned progress.
+On your first visit, you start at the home hub. Use the greeting menu to choose your character and skin tone. Find the soil bed marked **1**, face it, and press **A** to reach **A1 — Starter Beds**. Arrows mark usable exits; stone closes routes to areas you have not earned yet. After a code edit or restart, you return directly to your saved area. You can change your appearance at the shop without losing earned progress.
 
 At the hub, face the shop or armory door and press **A** to enter. Inside, walk up to a counter or weapon stand and press **A** to open its menu. Walk through the bottom doorway to return to the hub.
 
 In A1, walk to the **Plant** and **Water** stations just below the Starter Beds. Face a station and press **A** to run its Plant or Water job. Open the first Recipe for the code that controls those jobs:
 
 [Open R01](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r01)
+
+The **Next:** message names your next action and the Recipe to open when code is needed. Follow the blinking arrow above the work or practice pad, then face the pad and press **A** to run your current code.
+
+#### ~ tutorialhint
+
+```blocks
+farm.onPlant(function (job) {
+    for (let index = 0; index < farm.plantCount(job); index++) {
+        farm.plantNext(job)
+    }
+})
+
+farm.onWater(function (job) {
+    for (let index = 0; index < farm.waterCount(job); index++) {
+        farm.waterNext(job)
+    }
+})
+```
 
 ## Recipe directory
 
@@ -34,6 +52,22 @@ Each Recipe continues in this same Magical Farm project. Your earned areas and u
 - **A11 — Packing Barn: Nested Work and Seal:** [Open R14](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r14)
 - **A12 — Moon Grove: Full Farm Synthesis:** [Open R15](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r15)
 - **A12 — Stormbloom Projection: Final Synthesis:** [Open R16](https://arcade.makecode.com/#recipe:https://github.com/mrbrackebusch-code/magical-farm/docs/tutorials/r16)
+
+#### ~ tutorialhint
+
+```blocks
+farm.onPlant(function (job) {
+    for (let index = 0; index < farm.plantCount(job); index++) {
+        farm.plantNext(job)
+    }
+})
+
+farm.onWater(function (job) {
+    for (let index = 0; index < farm.waterCount(job); index++) {
+        farm.waterNext(job)
+    }
+})
+```
 
 [Optional upgrade prediction and reuse](https://github.com/mrbrackebusch-code/magical-farm/blob/main/docs/optional-upgrades.md)
 
@@ -449,8 +483,8 @@ export function conductive(job: number): boolean { return farmProgram.test(job, 
 // SUPPLIED SOURCE: config.ts
 // Supplied project configuration. Conserve usage; define this exactly once.
 namespace userconfig {
-export const ARCADE_SCREEN_WIDTH = 640
-export const ARCADE_SCREEN_HEIGHT = 480
+export const ARCADE_SCREEN_WIDTH = 480
+export const ARCADE_SCREEN_HEIGHT = 360
 }
 
 // SUPPLIED SOURCE: art.ts
@@ -19128,6 +19162,8 @@ return null
 namespace farmWorldView {
 let terrainKeys: string[] = []
 let terrainImages: Image[] = []
+let walkingLayout: farmTypes.Layout = null
+let walkingCells: number[] = []
 
 export function installPalette(): void {
 image.setPalette(hex`000000ffffff ff4055c957ff c98b67ffe64a 50c14064d14c 799aff7ab5ff 88de5f94a2a3 4c3f38ebb97c 21e9ff000000`)
@@ -19138,7 +19174,10 @@ if (x < 0 || y < 0 || x >= layout.width || y >= layout.height) return ""
 let cell = y * layout.width + x
 let ground = layout.ground[cell]
 if (ground == 12) return "fence"
-if (ground == 2) return "path"
+if (ground == 2) {
+if (walkingLayout != layout) { walkingLayout = layout; walkingCells = farmLayout.walkingTiles(layout) }
+return walkingCells.indexOf(cell) >= 0 ? "stone.path" : "path"
+}
 if (ground == 3) {
 if (layout.interior > 0) return x == 0 || y == 0 || x == layout.width - 1 || y == layout.height - 1 ? "room.wall" : "room.counter"
 return "cliff"
@@ -19160,7 +19199,31 @@ function terrain(family: string, variant: number): Image {
 let key = family + "." + variant
 for (let i = 0; i < terrainKeys.length; i++) if (terrainKeys[i] == key) return terrainImages[i]
 let result: Image = null
-if (family == "room.wall") {
+let floorBackground = variant >= 20
+if (floorBackground) variant -= 20
+if (family == "stone.path") {
+// Exact selected rock2 pixels form grey stone pavers over the
+// source path centre. Keep natural brown shadows and grey highlights.
+result = farmWorldArt.tile("path", 4).clone()
+for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+let c = result.getPixel(x, y)
+if (c == 13) c = 11
+else if (c == 4) c = 12
+result.setPixel(x, y, c)
+}
+result.drawTransparentImage(farmWorldArt.object("rock2"), 0, 0)
+} else if ((family == "soil" || family.substr(0, 5) == "soil.") && variant == 9) {
+// A single logical plot needs the whole rounded source bed, rather
+// than the rectangular atlas centre. Sample its32px inner patch at
+// exact2:1 scale, keeping one16px simulation cell and its foot centre.
+result = image.create(16, 16)
+for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+let sx = 8 + x * 2
+let sy = 8 + y * 2
+let part = Math.floor(sy / 16) * 3 + Math.floor(sx / 16)
+result.setPixel(x, y, farmWorldArt.tile(family, part).getPixel(sx % 16, sy % 16))
+}
+} else if (family == "room.wall") {
 // Exact bare white/tan wall pane from the approved source house.
 result = image.create(16, 16)
 result.drawImage(farmWorldArt.object("house"), -8, -61)
@@ -19185,20 +19248,38 @@ if (color) result.setPixel(x, y, color)
 }
 } else result.drawTransparentImage(source, -16, 0)
 } else result = farmWorldArt.tile(family, variant)
+if (floorBackground) {
+result = result.clone()
+let floor = farmWorldArt.tile("floor", 4)
+for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+let c = result.getPixel(x, y)
+if (c == 6 || c == 7 || c == 10) result.setPixel(x, y, floor.getPixel(x, y))
+}
+}
 terrainKeys.push(key)
 terrainImages.push(result)
 return result
 }
 
+function soilFamily(family: string): boolean {
+return family == "soil" || family.substr(0, 5) == "soil."
+}
+
+function sameBed(layout: farmTypes.Layout, family: string, x: number, y: number): boolean {
+let neighbor = material(layout, x, y)
+return soilFamily(family) ? soilFamily(neighbor) : neighbor == family
+}
+
 function variant(layout: farmTypes.Layout, family: string, x: number, y: number): number {
-if (family == "grass" || family == "floor" || family == "cliff" || family == "room.wall" || (family == "soil" && layout.area == 0)) return 4
-let north = material(layout, x, y - 1) == family
-let south = material(layout, x, y + 1) == family
-let west = material(layout, x - 1, y) == family
-let east = material(layout, x + 1, y) == family
+if (family == "grass" || family == "floor" || family == "cliff" || family == "stone.path" || family == "room.wall" || (family == "soil" && layout.area == 0)) return 4
+let north = sameBed(layout, family, x, y - 1)
+let south = sameBed(layout, family, x, y + 1)
+let west = sameBed(layout, family, x - 1, y)
+let east = sameBed(layout, family, x + 1, y)
 if (family == "fence") return (north || south) && !west && !east ? 1 : 0
-// Single-cell paths/plots need centre fills to remain readable. Broad
-// patches use actual corners and edges at their material transitions.
+if (soilFamily(family) && !north && !south && !west && !east) return 9
+// Soil states share one boundary. Dry/wet/inactive transitions never
+// introduce false green edges in the middle of the same authored bed.
 if ((!north && !south) || (!west && !east)) return 4
 let row = !north ? 0 : (!south ? 2 : 1)
 let col = !west ? 0 : (!east ? 2 : 1)
@@ -19235,6 +19316,10 @@ for (let x = 0; x < layout.width; x++) {
 let closed = blocked.indexOf(y * layout.width + x) >= 0
 let family = closed ? "cliff" : material(layout, x, y)
 let selected = closed ? 4 : variant(layout, family, x, y)
+// Barn-floor defender beds inherit the surrounding source wood
+// instead of stamping source grass into an indoor floor.
+if (soilFamily(family) && (material(layout, x - 1, y) == "floor" || material(layout, x + 1, y) == "floor" ||
+material(layout, x, y - 1) == "floor" || material(layout, x, y + 1) == "floor")) selected += 20
 let key = family + "." + selected
 let index = -1
 for (let i = 16; i < keys.length; i++) if (keys[i] == key) index = i
@@ -19289,6 +19374,112 @@ if (Math.abs(tile % layout.width - x) < 4 && Math.abs(Math.idiv(tile, layout.wid
 return true
 }
 
+let padImages: Image[] = []
+let guidance: Sprite = null
+let guidanceImage: Image = null
+let guidanceLayout: farmTypes.Layout = null
+let guidanceId = -1
+let guidanceElapsed = 0
+let guidanceActive = false
+
+// Code-native symbols, cached once: sprout, water drop, raid shield,
+// harvest fruit and work tool. No words or gameplay hitboxes in these pads.
+export function actionPad(object: farmTypes.WorldObject): Image {
+let type = object.kind == farmTypes.ObjectKind.PracticePad ? 5 : object.kind == farmTypes.ObjectKind.Ready ? 2 : (object.kind == farmTypes.ObjectKind.Harvest ? 3 :
+(object.arg == farmTypes.Task.Plant ? 0 : (object.arg == farmTypes.Task.Water ? 1 : 4)))
+if (padImages[type]) return padImages[type]
+let pad = image.create(24, 24)
+for (let y = 1; y < 23; y++) for (let x = 1; x < 23; x++) {
+let dx = x - 12
+let dy = y - 12
+if (dx * dx + dy * dy <= 121) pad.setPixel(x, y, 15)
+if (dx * dx + dy * dy <= 81) pad.setPixel(x, y, 11)
+}
+if (type == 0) {
+pad.fillRect(11, 9, 2, 10, 12)
+pad.fillRect(5, 7, 6, 4, 7)
+pad.fillRect(13, 5, 6, 4, 10)
+pad.drawLine(6, 8, 12, 13, 6)
+pad.drawLine(17, 6, 12, 11, 6)
+} else if (type == 1) {
+for (let y = 5; y <= 18; y++) {
+let radius = y < 12 ? Math.floor((y - 4) / 2) : (y < 17 ? 5 : 3)
+pad.fillRect(12 - radius, y, radius * 2 + 1, 1, 9)
+}
+pad.fillRect(9, 12, 2, 4, 1)
+} else if (type == 2) {
+pad.fillRect(6, 5, 13, 9, 8)
+for (let y = 14; y <= 19; y++) pad.fillRect(6 + y - 14, y, 13 - 2 * (y - 14), 1, 8)
+pad.drawLine(8, 11, 11, 14, 1)
+pad.drawLine(11, 14, 16, 8, 1)
+} else if (type == 3) {
+pad.fillRect(6, 9, 13, 8, 2)
+pad.fillRect(8, 7, 9, 12, 2)
+pad.fillRect(12, 4, 2, 4, 12)
+pad.fillRect(14, 5, 5, 3, 7)
+pad.fillRect(8, 10, 2, 4, 1)
+} else if (type == 5) {
+pad.drawLine(12, 4, 12, 20, 5)
+pad.drawLine(4, 12, 20, 12, 5)
+pad.drawLine(6, 6, 18, 18, 3)
+pad.drawLine(6, 18, 18, 6, 3)
+pad.fillRect(10, 10, 5, 5, 1)
+} else {
+pad.drawLine(7, 18, 16, 7, 12)
+pad.drawLine(8, 18, 17, 7, 12)
+pad.fillRect(11, 5, 9, 4, 1)
+pad.fillRect(11, 8, 9, 2, 12)
+}
+padImages[type] = pad
+return pad
+}
+
+export function soilPlot(): Image {
+return terrain("soil.dry", 9)
+}
+
+export function nextAction(layout: farmTypes.Layout, kind: number, targetObjectId: number): void {
+if (guidanceLayout == layout && guidanceId == targetObjectId) return
+guidanceLayout = layout
+guidanceId = targetObjectId
+guidanceActive = false
+guidanceElapsed = 0
+let target: farmTypes.WorldObject = null
+if (layout && targetObjectId > 0) for (let i = 0; i < layout.objects.length; i++) {
+if (layout.objects[i].id == targetObjectId) target = layout.objects[i]
+}
+if (!target) {
+if (guidance) guidance.setFlag(SpriteFlag.Invisible, true)
+return
+}
+if (!guidanceImage) {
+guidanceImage = image.create(20, 14)
+guidanceImage.fillRect(7, 0, 6, 7, 15)
+guidanceImage.fillRect(8, 0, 4, 7, 5)
+for (let y = 5; y < 14; y++) {
+let width = (14 - y) * 2
+guidanceImage.fillRect(10 - width / 2, y, width, 1, 15)
+if (width > 4) guidanceImage.fillRect(12 - width / 2, y, width - 4, 1, 5)
+}
+}
+if (!guidance) {
+guidance = sprites.create(guidanceImage, kind)
+guidance.setFlag(SpriteFlag.Ghost, true)
+guidance.z = 9000
+}
+guidance.setPosition(target.x, target.y - 26)
+guidance.setFlag(SpriteFlag.Invisible, false)
+guidanceActive = true
+}
+
+// Parent invokes this from its one existing update path. dt only; no new
+// timers, controller callbacks, images or sprites are allocated here.
+export function pulse(dtMs: number): void {
+if (!guidance || !guidanceActive) return
+guidanceElapsed = (guidanceElapsed + dtMs) % 800
+guidance.setFlag(SpriteFlag.Invisible, guidanceElapsed >= 560)
+}
+
 function labelSprite(label: string, x: number, y: number, kind: number): Sprite {
 let sign = image.create(label.length * 6 + 4, 12)
 sign.fill(1)
@@ -19339,6 +19530,15 @@ glass.z = 3
 result.push(glass)
 result.push(labelSprite("EXIT", 328, 424, kind))
 return result
+}
+for (let i = 0; i < layout.objects.length; i++) {
+let o = layout.objects[i]
+if (o.kind != farmTypes.ObjectKind.TaskStation && o.kind != farmTypes.ObjectKind.Ready && o.kind != farmTypes.ObjectKind.PracticePad) continue
+let pad = sprites.create(actionPad(o), kind)
+pad.setFlag(SpriteFlag.Ghost, true)
+pad.setPosition(o.x, o.y)
+pad.z = 7
+result.push(pad)
 }
 // Direction signs identify only usable authored perimeter exits.
 for (let i = 0; i < layout.objects.length; i++) {
@@ -20485,6 +20685,14 @@ chosenTone = 0
 clearFrames()
 if (logicalSprite) update(0)
 }
+let attackCueMs = 0
+let attackCueX = 0
+let attackCueY = 0
+export function attackCue(facingX: number, facingY: number): void {
+attackCueMs = 120
+attackCueX = facingX
+attackCueY = facingY
+}
 export function attach(logical: Sprite): void {
 if (!logical) return
 ensureLoaded()
@@ -20495,7 +20703,7 @@ shownImage = frame(0)
 visualSprite = sprites.create(shownImage, visualKind)
 visualSprite.setFlag(SpriteFlag.Ghost, true)
 visualSprite.setFlag(SpriteFlag.AutoDestroy, false)
-visualSprite.z = 5
+visualSprite.z = 10000
 }
 update(0)
 }
@@ -20517,9 +20725,11 @@ if (next != shownImage) {
 visualSprite.setImage(next)
 shownImage = next
 }
-visualSprite.x = logicalSprite.x
-visualSprite.bottom = logicalSprite.y + 12
-visualSprite.z = 5
+attackCueMs = Math.max(0, attackCueMs - Math.max(0, dtMs))
+const twitch = attackCueMs > 60 ? 4 : attackCueMs > 0 ? -1 : 0
+visualSprite.x = logicalSprite.x + attackCueX * twitch
+visualSprite.bottom = logicalSprite.y + 12 + attackCueY * twitch
+visualSprite.z = 10000
 }
 }
 
@@ -30227,6 +30437,12 @@ if (!safe[cell] && !layout.walls[cell]) { layout.ground[cell] = 12; layout.walls
 }
 }
 }
+// Defender beds use the same single-cell convention as crop/task
+// anchors. These are terrain only; IDs, ranges, masks and walls stay put.
+for (let i = 0; i < layout.defenderSlots.length; i++) {
+let tile = layout.defenderSlots[i].tile
+if (!layout.walls[tile]) layout.ground[tile] = 5
+}
 return layout
 }
 
@@ -30245,6 +30461,45 @@ let y = side == 2 ? depth : (side == 3 ? layout.height - 1 - depth : cy + across
 if (x >= 0 && y >= 0 && x < layout.width && y < layout.height) cells.push(y * layout.width + x)
 }
 return cells
+}
+
+// Source-authored Hub branches are the intentional noncombat walking
+// corridors. Ground IDs and physics are unchanged; this is a display mask.
+export function walkingTiles(layout: farmTypes.Layout): number[] {
+let result: number[] = []
+if (layout.interior > 0) return result
+if (layout.area == 0) {
+for (let i = 0; i < layout.ground.length; i++) if (layout.ground[i] == 2) result.push(i)
+return result
+}
+let branch: number[] = []
+if (layout.area == 1) branch = [1488, 1489, 1490, 1491, 1492, 1493, 1494, 1495, 1496, 1497, 1498, 1499, 1500, 1452, 1404, 1356, 1357, 1358, 1359, 1360, 1361, 1362]
+if (layout.area == 2) branch = [363, 362, 361, 360, 359, 358, 357, 356, 355, 354, 406, 458, 510]
+if (layout.area == 3) branch = [2054, 2002, 1950, 1898, 1846, 1794, 1742, 1690, 1691, 1692, 1693, 1694, 1695, 1696, 1697, 1698, 1699]
+if (layout.area == 4) branch = [2324, 2268, 2212, 2156, 2157, 2158, 2159, 2160, 2161, 2162, 2163, 2164]
+if (layout.area == 5) branch = [2323, 2267, 2211, 2155, 2099, 2100, 2101, 2102, 2103]
+if (layout.area == 6) branch = [2240, 2241, 2242, 2243, 2244, 2245, 2246, 2247, 2248, 2249, 2250, 2251, 2252, 2196, 2140]
+if (layout.area == 7) branch = [2320, 2321, 2322, 2323, 2324, 2325, 2326, 2327, 2328, 2270, 2212, 2154, 2096, 2097, 2098, 2099, 2100, 2101]
+if (layout.area == 8) branch = [2490, 2430, 2370, 2310, 2250, 2251, 2252, 2253, 2254]
+if (layout.area == 9) branch = [2730, 2670, 2610, 2550, 2490, 2430, 2370]
+if (layout.area == 10) branch = [2459, 2458, 2457, 2456, 2455, 2454, 2394, 2334, 2274]
+if (layout.area == 11) branch = [2541, 2540, 2539, 2538, 2537, 2536, 2474, 2412, 2350]
+if (layout.area == 12) branch = [3016, 2952, 2888, 2824, 2760, 2696, 2697, 2698, 2699, 2700]
+for (let i = 0; i < branch.length; i++) {
+let cx = branch[i] % layout.width
+let cy = Math.floor(branch[i] / layout.width)
+for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+let x = cx + dx
+let y = cy + dy
+if (x < 0 || y < 0 || x >= layout.width || y >= layout.height) continue
+let tile = y * layout.width + x
+if (layout.walls[tile] || layout.ground[tile] != 2 || result.indexOf(tile) >= 0) continue
+let combatRoute = false
+for (let j = 0; j < layout.routes.length; j++) if (layout.routes[j].tiles.indexOf(tile) >= 0) combatRoute = true
+if (!combatRoute) result.push(tile)
+}
+}
+return result
 }
 
 export function interior(room: number): farmTypes.Layout {
@@ -31225,7 +31480,7 @@ const CROP_WILTED = 5
 // state; public Harvest/cropDamage slot arguments are 1-based within the
 // current area and are mapped through SLOT_START.
 const MAX_CROP_SLOTS = 97
-const SAVE_VERSION = 1
+const SAVE_VERSION = 2
 const SAVE_SLOT_RECORD_WIDTH = 4 // state, hp, due, meta
 const SAVE_A1_PLOT_COUNT = 10
 const SAVE_FIXED_FIELDS = 18
@@ -31249,6 +31504,11 @@ let activeArea = 0
 let activeLayout: farmTypes.Layout = null
 let helper: Sprite = null
 let helperKey = ""
+let workPulse: Sprite = null
+let workPulseImages: Image[] = []
+let workPulseSerial = 0
+let workContexts: farmTypes.Context[] = []
+let lastWorkTask: number[] = []
 let cropSprites: Sprite[] = []
 let cropSpriteSlots: number[] = []
 let taskSprites: Sprite[] = []
@@ -31374,6 +31634,8 @@ helper.destroy()
 helper = null
 }
 helperKey = ""
+if (workPulse) workPulse.destroy()
+workPulse = null
 destroyCropSprites()
 for (let i = 0; i < taskSprites.length; i++) taskSprites[i].destroy()
 taskSprites = []
@@ -31432,7 +31694,7 @@ number = context.data[29 + i]
 key = context.data[11 + i] ? "effect.threat" : "object.bed.marker"
 finished = context.data[26 + i] != 0
 }
-let picture = farmArt.frame(key, 0)
+let picture = key == "object.bed.marker" ? farmWorldView.soilPlot() : farmArt.frame(key, 0)
 if (finished || number >= 0) picture = picture.clone()
 if (finished) {
 picture.drawRect(0, 0, picture.width, picture.height, 7)
@@ -31477,53 +31739,70 @@ return "helper.worker"
 }
 
 function ensureHelper(task: number): Sprite {
-let key = helperArtForTask(task)
-if (helper && helperKey == key) return helper
-if (helper) helper.destroy()
-helperKey = key
-helper = sprites.create(farmArt.frame(key, 0), HelperKind)
-if (activeLayout && activeLayout.entry) {
-helper.x = activeLayout.entry.x
-helper.y = activeLayout.entry.y
+if (helper) {
+helper.setFlag(SpriteFlag.Invisible, false)
+return helper
 }
+// Existing authored avatar art, cached by farmAvatar; no generated dot.
+helper = sprites.create(farmAvatar.portrait(2, 1), HelperKind)
+let player = farmWorld.player()
+if (player) helper.setPosition(player.x, player.y)
 helper.setFlag(SpriteFlag.Ghost, true)
 return helper
 }
 
-// Synchronous visible helper traversal. This is not learner repetition: one
-// learner primitive may move to exactly one authored target and do one job.
 function moveHelperToPixel(context: farmTypes.Context, x: number, y: number): boolean {
+if (context.cancelled) return false
 let actor = ensureHelper(context.task)
-let frame = 0
-let animationMs = 0
-let frames = farmArt.frames(helperKey)
-let frameMs = farmArt.frameMs(helperKey)
-if (frameMs < 20) frameMs = 20
-
-while (!context.cancelled && (actor.x != x || actor.y != y)) {
-let dx = x - actor.x
-let dy = y - actor.y
-// Travel at 200px/s; animation timing must not throttle work speed.
-// Fixed 20ms yield keeps each named action visible and cooperative.
-if (dx > 4) dx = 4
-if (dx < -4) dx = -4
-if (dy > 4) dy = 4
-if (dy < -4) dy = -4
-actor.x += dx
-actor.y += dy
-animationMs += 20
-if (animationMs >= frameMs && frames && frames.length > 0) {
-actor.setImage(frames[frame % frames.length])
-frame += 1
-animationMs = 0
-}
-pause(20)
-}
-if (context.cancelled) {
-noteWrong(context, OUTCOME_CANCELLED_DURING_ACTION)
-return false
-}
+// Poof directly to this authored work target, never simulated pathfinding.
+actor.setPosition(x, y - 12)
+actor.z = y + 2
 return true
+}
+
+function showWorkPulse(context: farmTypes.Context): void {
+let actor = ensureHelper(context.task)
+if (workPulseImages.length == 0) {
+workPulseImages.push(farmArt.frame("effect.energy", 0))
+workPulseImages.push(farmArt.frame("effect.energy", 1))
+}
+if (!workPulse) {
+workPulse = sprites.create(workPulseImages[0], HelperKind)
+workPulse.setFlag(SpriteFlag.Ghost, true)
+}
+workPulseSerial += 1
+workPulse.setImage(workPulseImages[workPulseSerial % 2])
+workPulse.setPosition(actor.x + 10, actor.y - 8)
+workPulse.z = actor.z + 1
+// A short off/on edge distinguishes even repetitions at the same plot.
+workPulse.setFlag(SpriteFlag.Invisible, true)
+pause(30)
+if (context.cancelled || !helper || !workPulse) return
+workPulse.setFlag(SpriteFlag.Invisible, false)
+actor.y -= 3
+pause(100)
+if (helper == actor) actor.y += 3
+if (workPulse) workPulse.setFlag(SpriteFlag.Invisible, true)
+}
+
+function rememberWork(context: farmTypes.Context): void {
+if (!context || context.mode == farmTypes.Mode.Regrow || context.task < 1 || context.task > 13 || context.area != taskArea(context.task)) return
+while (workContexts.length <= context.task) workContexts.push(null)
+while (lastWorkTask.length <= context.area) lastWorkTask.push(0)
+workContexts[context.task] = context
+lastWorkTask[context.area] = context.task
+farmWorld.dirtyWork()
+}
+
+function restoreWorkView(): void {
+let task = activeArea < lastWorkTask.length ? lastWorkTask[activeArea] : 0
+if (task > 0 && task < workContexts.length && workContexts[task]) refreshTaskView(workContexts[task])
+else if (activeArea == 1) {
+let context = new farmTypes.Context()
+context.task = farmTypes.Task.Water; context.area = 1; context.mode = farmTypes.Mode.Farm
+context.data = [0, 0, 0, plantCountForProgress(), 0]
+refreshTaskView(context)
+}
 }
 
 function moveHelperToTile(context: farmTypes.Context, tile: number): boolean {
@@ -31901,6 +32180,7 @@ return true
 irrigationSupply = 4
 irrigationRefilled = true
 irrigationStage = 3
+farmWorld.dirtyWork()
 farmWorld.notice("The spring refilled the cistern with 4 water. The same irrigation code runs again.")
 farmWorld.checkpoint("a6-spring")
 startTask(farmTypes.Task.Irrigate, 6, farmTypes.Mode.Farm)
@@ -32241,20 +32521,8 @@ a1RegrowAttempted = false
 a1RegrowPhase = 0
 syncProductionState()
 renderActiveCrops()
-// Authored task stations need ordinary visible action names, especially
-// A1's distinct planting/watering stations rather than harvest markers.
-for (let i = 0; i < activeLayout.objects.length; i++) {
-let object = activeLayout.objects[i]
-if (object.kind != farmTypes.ObjectKind.TaskStation) continue
-let label = object.arg == farmTypes.Task.Plant ? "A PLANT" : object.arg == farmTypes.Task.Water ? "A WATER" : "A WORK"
-let picture = image.create(44, 10)
-picture.fill(15)
-picture.print(label, 1, 1, 1)
-let sprite = sprites.create(picture, CropKind)
-sprite.x = object.x; sprite.y = object.y + 22; sprite.z = 9
-sprite.setFlag(SpriteFlag.Ghost, true)
-stationLabels.push(sprite)
-}
+// World presentation supplies the cached action icons and next-target
+// pulse; domain state must not overlay obsolete word-label rectangles.
 let progress = farmWorld.progress()
 if (area > 1 && progress.phase[area] == farmTypes.Phase.Farm && !progress.farmEarned[area + 1]) {
 let initial = new farmTypes.Context()
@@ -32262,6 +32530,7 @@ initial.task = area + 1; initial.area = area; initial.mode = farmTypes.Mode.Farm
 seedTaskContext(initial)
 refreshTaskView(initial)
 }
+restoreWorkView()
 maybeStartA1Regrow()
 if (activeLayout) {
 let elapsed = game.runtime()
@@ -32325,6 +32594,8 @@ context.cancelled = false
 context.ops = 0
 context.trace = []
 seedTaskContext(context)
+rememberWork(context)
+refreshTaskView(context)
 return context
 }
 
@@ -33004,8 +33275,8 @@ noteWrong(context, OUTCOME_NOT_IMPLEMENTED)
 farmWorld.notice("This farm action belongs to a later branch step.")
 }
 refreshTaskView(context)
-// Even a same-position primitive gets a readable consequence frame.
-pause(120)
+rememberWork(context)
+showWorkPulse(context)
 }
 
 export function read(context: farmTypes.Context, reader: number): number {
@@ -33177,7 +33448,30 @@ result.code = farmTypes.ResultCode.Wrong
 result.message = taskMessage(context.task) + " The visible farm state is not complete yet."
 }
 result.trace = copyNumbers(context.trace)
+if (helper) helper.setFlag(SpriteFlag.Invisible, true)
+farmWorld.dirtyWork()
 return result
+}
+
+export function guidanceTask(area: number): number {
+if (area < 1 || area > 12) return 0
+if (area == 1) {
+let count = farmWorld.plotCapacity(1)
+for (let i = 0; i < count; i++) if (i >= a1PlotState.length || a1PlotState[i] < 1) return farmTypes.Task.Plant
+if (!farmWorld.farmTaskEarned(farmTypes.Task.Plant)) return farmTypes.Task.Plant
+for (let i = 0; i < count; i++) if (a1PlotState[i] < 2) return farmTypes.Task.Water
+if (!farmWorld.farmTaskEarned(farmTypes.Task.Water)) return farmTypes.Task.Water
+} else {
+if (area == 6 && irrigationStage == 2) return -1
+let task = area + 1
+if (task < workContexts.length && workContexts[task] && workContexts[task].data[DATA_STATUS] != STATUS_SUCCESS) return task
+if (!farmWorld.farmTaskEarned(task)) return task
+}
+for (let local = 1; local <= BASE_CROP_COUNT[area]; local++) {
+let slot = SLOT_START[area] + local - 1
+if (slot >= cropState.length || cropState[slot] == CROP_EMPTY || cropState[slot] == CROP_WILTED) return area == 1 ? farmTypes.Task.Water : area + 1
+}
+return 0
 }
 
 export function ready(area: number): boolean {
@@ -33228,12 +33522,23 @@ data.push(cropHp[slot])
 data.push(cropDue[slot])
 data.push(cropMeta[slot])
 }
+let count = 0
+for (let task = 1; task < workContexts.length; task++) if (workContexts[task]) count += 1
+data.push(count)
+for (let area = 0; area <= 12; area++) data.push(area < lastWorkTask.length ? lastWorkTask[area] : 0)
+for (let task = 1; task < workContexts.length; task++) {
+let context = workContexts[task]
+if (!context) continue
+data.push(task); data.push(context.area); data.push(context.resource)
+data.push(context.cursor); data.push(context.group); data.push(context.data.length)
+for (let i = 0; i < context.data.length; i++) data.push(context.data[i])
+}
 return data
 }
 
 export function importState(data: number[]): boolean {
-if (!data || data.length != SAVE_LENGTH) return false
-if (data[0] != SAVE_VERSION || data[1] != MAX_CROP_SLOTS || data[2] != SAVE_SLOT_RECORD_WIDTH || data[3] != SAVE_A1_PLOT_COUNT) return false
+if (!data || data.length < SAVE_LENGTH) return false
+if ((data[0] != 1 && data[0] != SAVE_VERSION) || data[1] != MAX_CROP_SLOTS || data[2] != SAVE_SLOT_RECORD_WIDTH || data[3] != SAVE_A1_PLOT_COUNT) return false
 if (!intInRange(data[4], 0, 4)) return false
 if (!intInRange(data[5], 0, 1)) return false
 if (!intInRange(data[6], 0, 7)) return false
@@ -33267,6 +33572,40 @@ nextMeta.push(meta)
 offset += SAVE_SLOT_RECORD_WIDTH
 }
 
+let nextWork: farmTypes.Context[] = []
+let nextLast: number[] = []
+if (data[0] == 1) {
+if (data.length != SAVE_LENGTH) return false
+} else {
+if (data.length < SAVE_LENGTH + 14) return false
+let count = data[offset++]
+if (!intInRange(count, 0, 13)) return false
+for (let area = 0; area <= 12; area++) {
+let task = data[offset++]
+if (!intInRange(task, 0, 13) || (task > 0 && taskArea(task) != area)) return false
+nextLast.push(task)
+}
+for (let i = 0; i < count; i++) {
+if (offset + 6 > data.length) return false
+let task = data[offset++]; let area = data[offset++]
+let resource = data[offset++]; let cursor = data[offset++]; let group = data[offset++]
+let length = data[offset++]
+if (!intInRange(task, 1, 13) || taskArea(task) != area || (task < nextWork.length && nextWork[task])) return false
+if (!intInRange(resource, 0, 1000) || !intInRange(cursor, -1, 1000) || !intInRange(group, -1, 1000) || !intInRange(length, 3, 128) || offset + length > data.length) return false
+let context = new farmTypes.Context()
+context.task = task; context.area = area; context.mode = farmTypes.Mode.Farm
+context.resource = resource; context.cursor = cursor; context.group = group
+for (let j = 0; j < length; j++) {
+let value = data[offset++]
+if (!intInRange(value, -1000000, 1000000)) return false
+context.data.push(value)
+}
+while (nextWork.length <= task) nextWork.push(null)
+nextWork[task] = context
+}
+if (offset != data.length) return false
+for (let area = 1; area <= 12; area++) if (nextLast[area] > 0 && !nextWork[nextLast[area]]) return false
+}
 // Transactional commit only after the entire candidate validates.
 irrigationSupply = data[4]
 irrigationRefilled = data[5] == 1
@@ -33277,11 +33616,14 @@ cropState = nextState
 cropHp = nextHp
 cropDue = nextDue
 cropMeta = nextMeta
+workContexts = nextWork
+lastWorkTask = nextLast
 a1RegrowAttempted = false
 a1RegrowPhase = 0
 syncExpansionSlots()
 advanceDueCrops()
 refreshActiveCrops()
+restoreWorkView()
 return true
 }
 
@@ -33371,6 +33713,14 @@ const MAX_LIVE_ENEMIES = 16
 const MAX_LIVE_EFFECTS = 24
 const MAX_SAME_TASK_QUEUE = 8
 const MAX_BLOCKED_SPAWNS = 32
+const WAVE_ENTRY_GAP_PX = 32
+let monsterViews: Image[] = []
+let monsterFeet: number[] = []
+let weaponViews: Image[] = []
+let weaponView: Sprite = null
+let weaponViewUntil = 0
+let operationCueImages: Image[] = []
+let operationCueSerial = 0
 const MAX_PENDING_CHILDREN = 32
 
 // Context.data layout owned by 03-combat. Index 0 was already the lifecycle
@@ -33570,6 +33920,7 @@ species: number = 0
 sprite: Sprite = null
 visual: Sprite = null
 lastVisualY: number = 0
+attackViewUntil: number = 0
 epoch: number = 0
 hp: number = 0
 maxHp: number = 0
@@ -33659,6 +34010,8 @@ crop: number = 0
 slot: number = -1
 sprite: Sprite = null
 visual: Sprite = null
+cueSprite: Sprite = null
+cueUntil: number = 0
 epoch: number = 0
 hp: number = 0
 maxHp: number = 0
@@ -33916,11 +34269,40 @@ return false
 
 // Accepted64px view is separate from the retained original logical sprite.
 // The proxy stays invisible; pixel collision/range/routes are unchanged.
+function ensureMonsterViews(): void {
+if (monsterViews.length > 0) return
+for (let species = 1; species <= 13; species++) for (let pose = 0; pose < 2; pose++) {
+let source = farmMonsterArt.frame(species, pose == 1)
+let reduced = image.create(32, 32)
+let foot = 16
+for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
+let color = source.getPixel(x * 2, y * 2)
+reduced.setPixel(x, y, color)
+if (color > 0 && y > foot) foot = y
+}
+monsterViews.push(reduced)
+monsterFeet.push(foot)
+}
+}
+
+function presentMonster(enemy: EnemyRuntime, back: boolean): void {
+let index = (enemy.species - 1) * 2 + (back ? 1 : 0)
+enemy.visual.setImage(monsterViews[index])
+let moving = !enemy.movementPaused && !enemy.reachedObjective
+let bob = moving && Math.idiv(elapsedMs, 180) % 2 == 1 ? 1 : 0
+let lunge = enemy.attackViewUntil > elapsedMs ? 2 : enemy.hitFlashMs > 0 ? -2 : 0
+enemy.visual.setPosition(enemy.visualX + lunge, enemy.visualY - (monsterFeet[index] - 16) - bob)
+enemy.visual.z = Math.min(9000, enemy.visualY)
+enemy.visual.setFlag(SpriteFlag.Ghost, true)
+enemy.visual.setFlag(SpriteFlag.Invisible, (enemy.hitFlashMs > 0 || enemy.phased) && Math.idiv(elapsedMs, 40) % 2 == 0)
+}
+
 function createEnemyVisual(enemy: EnemyRuntime): void {
+ensureMonsterViews()
 enemy.sprite.setFlag(SpriteFlag.Invisible, true)
-enemy.visual = sprites.create(farmMonsterArt.frame(enemy.species, false), EnemyKind)
+enemy.visual = sprites.create(monsterViews[(enemy.species - 1) * 2], EnemyKind)
 enemy.lastVisualY = enemy.visualY
-farmMonsterArt.present(enemy.visual, enemy.species, enemy.visualX, enemy.visualY, false, elapsedMs, false, false)
+presentMonster(enemy, false)
 }
 
 function destroyEnemySprites(enemy: EnemyRuntime): void {
@@ -33933,7 +34315,7 @@ for (let i = 0; i < enemies.length; i++) {
 let enemy = enemies[i]
 if (!enemy.visual || enemy.pendingDestroy || !enemy.alive) continue
 let back = enemy.visualY < enemy.lastVisualY
-farmMonsterArt.present(enemy.visual, enemy.species, enemy.visualX, enemy.visualY, back, elapsedMs, enemy.hitFlashMs > 0, enemy.phased)
+presentMonster(enemy, back)
 enemy.lastVisualY = enemy.visualY
 }
 }
@@ -33948,6 +34330,8 @@ activeRunners = []
 }
 
 function clearTransientSprites(): void {
+destroyOwnedSprite(weaponView)
+weaponView = null
 for (let i = 0; i < effects.length; i++) destroyOwnedSprite(effects[i].sprite)
 for (let i = 0; i < enemies.length; i++) destroyEnemySprites(enemies[i])
 for (let i = 0; i < defenders.length; i++) destroyDefenderSprites(defenders[i])
@@ -35051,6 +35435,7 @@ return
 enemy.actionMs -= dtMs
 if (enemy.actionMs > 0) return
 if (!farmTasks.cropAlive(enemy.objectiveCropSlot) && !refreshEnemyCropObjective(enemy)) return
+enemy.attackViewUntil = elapsedMs + 90
 farmTasks.cropDamage(enemy.objectiveCropSlot, speciesCropBiteDamage(enemy.species))
 // Damage may have destroyed this crop synchronously. Select the next living
 // authored priority immediately, without changing route/travel progress.
@@ -35359,6 +35744,7 @@ return stageDefenderAtSlot(slotId)
 function destroyDefenderSprites(defender: DefenderRuntime): void {
 destroyOwnedSprite(defender.sprite)
 destroyOwnedSprite(defender.visual)
+destroyOwnedSprite(defender.cueSprite)
 }
 
 function defenderAnchorX(defender: DefenderRuntime): number {
@@ -35846,12 +36232,60 @@ let side = Math.abs(-playerFacingY * dx + playerFacingX * dy)
 return side <= 10
 }
 
+function swordView(weapon: number, direction: number): Image {
+let slot = weapon * 4 + direction
+while (weaponViews.length <= slot) weaponViews.push(null)
+if (weaponViews[slot]) return weaponViews[slot]
+let reach = weaponReachPx(weapon)
+let size = reach * 2 + 10
+let result = image.create(size, size)
+let center = Math.idiv(size, 2)
+let fx = direction == 0 ? 1 : direction == 1 ? -1 : 0
+let fy = direction == 2 ? 1 : direction == 3 ? -1 : 0
+let previousX = 0; let previousY = 0
+for (let side = -9; side <= 9; side += 3) {
+let forward = reach - Math.idiv(side * side, Math.max(1, reach))
+let x = center + fx * forward - fy * side
+let y = center + fy * forward + fx * side
+if (side > -9) {
+for (let ox = -1; ox <= 1; ox++) for (let oy = -1; oy <= 1; oy++) result.drawLine(previousX + ox, previousY + oy, x + ox, y + oy, 15)
+result.drawLine(previousX, previousY, x, y, 5)
+}
+result.setPixel(x - fx * 3, y - fy * 3, 1)
+previousX = x; previousY = y
+}
+let source = farmArt.frame(weaponArtKey(weapon), 0)
+let bladeSize = reach + 8
+// Enlarge the actual blade silhouette, removing old transparent padding.
+let minX = source.width - 1; let minY = source.height - 1
+let maxX = 0; let maxY = 0
+for (let y = 0; y < source.height; y++) for (let x = 0; x < source.width; x++) if (source.getPixel(x, y) > 0) {
+minX = Math.min(minX, x); minY = Math.min(minY, y)
+maxX = Math.max(maxX, x); maxY = Math.max(maxY, y)
+}
+let bladeForward = reach - Math.idiv(bladeSize, 2)
+for (let y = 0; y < bladeSize; y++) for (let x = 0; x < bladeSize; x++) {
+let color = source.getPixel(minX + Math.idiv(x * (maxX - minX + 1), bladeSize), minY + Math.idiv(y * (maxY - minY + 1), bladeSize))
+if (color > 0) result.setPixel(center + fx * bladeForward + x - Math.idiv(bladeSize, 2), center + fy * bladeForward + y - Math.idiv(bladeSize, 2), color)
+}
+weaponViews[slot] = result
+return result
+}
+
 function showWeaponSwing(player: Sprite, weapon: number): void {
 if (!player) return
-let reach = weaponReachPx(weapon)
-let x = player.x + playerFacingX * Math.idiv(reach, 2)
-let y = player.y + playerFacingY * Math.idiv(reach, 2)
-createEffect(weaponArtKey(weapon), 0, weaponSwingMs(weapon), x, y, 100 + weapon)
+let direction = playerFacingX > 0 ? 0 : playerFacingX < 0 ? 1 : playerFacingY > 0 ? 2 : 3
+let picture = swordView(weapon, direction)
+if (!weaponView) {
+weaponView = sprites.create(picture, ProjectileKind)
+weaponView.setFlag(SpriteFlag.Ghost, true)
+}
+weaponView.setImage(picture)
+weaponView.setPosition(player.x, player.y)
+weaponView.z = 10020
+weaponView.setFlag(SpriteFlag.Invisible, false)
+weaponViewUntil = elapsedMs + weaponSwingMs(weapon)
+farmAvatar.attackCue(playerFacingX, playerFacingY)
 }
 
 function updatePlayerContactDamage(): void {
@@ -35865,6 +36299,7 @@ if (enemy.contactDamage <= 0) continue
 // Use bounded center distance rather than a second overlap event handler;
 // World remains the sole top-level input/update owner.
 if (distanceSquared(enemy.visualX, enemy.visualY, player.x, player.y) > 144) continue
+enemy.attackViewUntil = elapsedMs + 90
 farmWorld.changePlayerHp(-enemy.contactDamage)
 playerInvulnerableMs = PLAYER_CONTACT_GATE_MS
 // World remains HP authority. The binding seam amendment gives Combat a
@@ -35953,6 +36388,25 @@ effect.frameCount = Math.max(1, farmArt.frameCount(key))
 effect.displayedFrame = frame
 effects.push(effect)
 return effect
+}
+
+function pulseDefenderOperation(context: farmTypes.Context): void {
+let actor = defenderById(context.actorId)
+if (!actor || !actor.sprite) return
+if (operationCueImages.length == 0) {
+operationCueImages.push(farmArt.frame("effect.energy", 0))
+operationCueImages.push(farmArt.frame("effect.heal", 0))
+}
+if (!actor.cueSprite) {
+actor.cueSprite = sprites.create(operationCueImages[0], ProjectileKind)
+actor.cueSprite.setFlag(SpriteFlag.Ghost, true)
+}
+operationCueSerial += 1
+actor.cueSprite.setImage(operationCueImages[operationCueSerial % 2])
+actor.cueSprite.setPosition(actor.sprite.x + 12, actor.sprite.y - 24)
+actor.cueSprite.z = Math.min(9000, actor.sprite.y + 3)
+actor.cueSprite.setFlag(SpriteFlag.Invisible, false)
+actor.cueUntil = elapsedMs + 130
 }
 
 function setDefenderAttackImage(defender: DefenderRuntime): void {
@@ -39010,8 +39464,22 @@ if (candidate.dueMs < current.dueMs) best = i
 return best
 }
 
+function waveEntryClear(routeId: number): boolean {
+let route = routeForSpawn(routeId)
+if (!route || route.tiles.length == 0) return false
+let x = tileCenterX(route.tiles[0]); let y = tileCenterY(route.tiles[0])
+for (let i = 0; i < enemies.length; i++) {
+let enemy = enemies[i]
+if (!enemy.alive || enemy.pendingDestroy || enemy.previewOnly) continue
+let dx = enemy.visualX - x; let dy = enemy.visualY - y
+if (dx * dx + dy * dy < WAVE_ENTRY_GAP_PX * WAVE_ENTRY_GAP_PX) return false
+}
+return true
+}
+
 function emitRaidSpawn(request: SpawnRequest): boolean {
 if (!request || request.routeId < 0) return false
+if (request.generation == 0 && !waveEntryClear(request.routeId)) return false
 return spawnEnemy(request.enemySpecies, request.routeId, request.generation) != null
 }
 
@@ -39228,6 +39696,7 @@ playerAttackCooldownMs = 0
 playerInvulnerableMs = 0
 playerFacingX = 0
 playerFacingY = 1
+ensureMonsterViews()
 activeLayout = farmWorld.layout()
 buildRouteCache(activeLayout)
 buildEnemyReachLookups()
@@ -39250,6 +39719,7 @@ export function update(dtMs: number): void {
 if (!entered) return
 let dt = clampDt(dtMs)
 elapsedMs += dt
+if (weaponView && elapsedMs >= weaponViewUntil) weaponView.setFlag(SpriteFlag.Invisible, true)
 if (raidActive) raidElapsedMs += dt
 if (playerAttackCooldownMs > 0) playerAttackCooldownMs = Math.max(0, playerAttackCooldownMs - dt)
 if (playerInvulnerableMs > 0) playerInvulnerableMs = Math.max(0, playerInvulnerableMs - dt)
@@ -39257,6 +39727,7 @@ updatePlayerFacing()
 for (let i = 0; i < defenders.length; i++) {
 let defender = defenders[i]
 if (!defender.wilted) farmPlantArt.animate(defender.visual, "crop." + cropArtStem(defender.crop) + ".rooted", elapsedMs)
+if (defender.cueSprite && elapsedMs >= defender.cueUntil) defender.cueSprite.setFlag(SpriteFlag.Invisible, true)
 }
 updatePreviewScenario(dt)
 
@@ -39444,6 +39915,7 @@ return
 }
 let outcome = performPowerPrimitive(context, action, value)
 appendTrace(context, action, value, outcome)
+pulseDefenderOperation(context)
 // Every learner primitive is one bounded world job and yields before the
 // wrapper returns. This keeps intended while loops cooperative without
 // moving repetition into supplied code.
@@ -39688,18 +40160,18 @@ const TILE_SIZE = 16
 const MAX_LAYOUT_TILES = 64
 const BARRIER_TILE_ID = 14
 const COLLISION_TILE_ID = 15
-const VIEWPORT_WIDTH = 640
-const VIEWPORT_HEIGHT = 480
+const VIEWPORT_WIDTH = 480
+const VIEWPORT_HEIGHT = 360
 const INTERACTION_RANGE = 28
 const INTERACTION_RANGE2 = INTERACTION_RANGE * INTERACTION_RANGE
-const MENU_X = 100
-const MENU_Y = 68
+const MENU_X = 20
+const MENU_Y = 24
 const MENU_WIDTH = 440
-const MENU_HEIGHT = 344
+const MENU_HEIGHT = 312
 const MENU_FONT = image.scaledFont(image.font8, 2)
 // Width minus menu border/padding, pinned scroll indicator, item padding.
 const MENU_TEXT_COLUMNS = Math.floor((MENU_WIDTH - 6 - 24 - 8 - 20) / MENU_FONT.charWidth)
-const MENU_LAYER = 200
+const MENU_LAYER = 30000
 const RECOVERY_NOTICE_MS = 5000
 const EXIT_TRIGGER_RANGE = 16
 const EXIT_TRIGGER_RANGE2 = EXIT_TRIGGER_RANGE * EXIT_TRIGGER_RANGE
@@ -39736,6 +40208,12 @@ let facingX = 0
 let facingY = 1
 let noticeText = ""
 let noticeUntil = 0
+let workDirty = false
+let workDirtySince = 0
+let nextInstruction = ""
+let nextInstructionLines: string[] = []
+let nextObjectId = -1
+let nextUpdateMs = 0
 let menuOpen = false
 let menuTitle = ""
 let menuOptions: string[] = []
@@ -40107,6 +40585,7 @@ for (let i = 0; i < source.objects.length; i++) {
 let object = source.objects[i]
 // Hub destinations are the actual source-soil beds and number badges.
 if (source.area == 0 && source.interior == 0 && object.kind == farmTypes.ObjectKind.Travel) continue
+if (object.kind == farmTypes.ObjectKind.Ready || object.kind == farmTypes.ObjectKind.PracticePad || object.kind == farmTypes.ObjectKind.DefenderSlot) continue
 // Interior stations are fully rendered by the room presentation.
 if (source.interior > 0 && (object.kind == farmTypes.ObjectKind.Shop || object.kind == farmTypes.ObjectKind.Armory)) continue
 let key = objectArtKey(object)
@@ -40258,7 +40737,7 @@ else chooseSkinTone(choice)
 }, icons)
 // Show all six portraits together on the existing 640x480 screen.
 if (menuSurface) {
-menuSurface.setDimensions(MENU_WIDTH, 420)
+menuSurface.setDimensions(MENU_WIDTH, Math.min(312, screen.height - 40))
 menuSurface.setPosition(screen.width / 2, screen.height / 2)
 }
 }
@@ -40277,6 +40756,7 @@ return
 }
 farmAvatar.select(character, choice)
 farmAvatar.attach(currentPlayer)
+checkpoint("appearance-start")
 if (currentProgress && currentProgress.area == 0) notice("SOIL BED 1. A INTERACTS; B ATTACKS.")
 }, icons)
 }
@@ -40939,6 +41419,7 @@ let elapsed = now - lastUpdateMs
 lastUpdateMs = now
 if (elapsed < 0) elapsed = 0
 farmAvatar.update(Math.min(elapsed, MAX_UPDATE_DT_MS))
+farmWorldView.pulse(Math.min(elapsed, MAX_UPDATE_DT_MS))
 
 if (!resetPendingRestart && !saveBlocked && !farmSave.blocked()) {
 // playedMs and productionTick receive actual active-runtime elapsed
@@ -40961,6 +41442,133 @@ finishPendingTransition()
 maybeTriggerExit()
 }
 periodicCheckpoint()
+if (workDirty && now - workDirtySince >= 120) checkpoint("visible-work")
+if (now >= nextUpdateMs) {
+nextUpdateMs = now + 200
+updateNextInstruction()
+}
+}
+
+function instructionTarget(kind: number, arg: number = 999): number {
+if (!currentLayout) return -1
+for (let i = 0; i < currentLayout.objects.length; i++) {
+let object = currentLayout.objects[i]
+if (object.kind == kind && (arg == 999 || object.arg == arg)) return object.id
+}
+return -1
+}
+
+function directNext(text: string, targetId: number): void {
+if (nextInstruction != text) nextInstructionLines = wrapLine("Next: " + text, Math.floor((VIEWPORT_WIDTH - 24) / image.font8.charWidth))
+nextInstruction = text
+nextObjectId = targetId
+farmWorldView.nextAction(currentLayout, WORLD_OBJECT_KIND, menuOpen ? -1 : targetId)
+}
+
+const FARM_RECIPE = [0, 1, 2, 4, 5, 6, 8, 10, 11, 12, 13, 14, 15]
+const POWER_RECIPE = [0, 0, 3, 4, 5, 7, 9, 10, 11, 12, 13, 14, 15]
+function recipeForFarm(area: number): number {
+// Exact current instruction-plan task bindings; recipe numbers are not
+// an arithmetic progression of world areas.
+return FARM_RECIPE[area]
+}
+
+function recipeForPower(area: number): number {
+return POWER_RECIPE[area]
+}
+
+function updateNextInstruction(): void {
+if (!currentLayout || !currentProgress) return
+if (saveBlocked) {
+directNext("Save needs recovery. Use the reset station.", instructionTarget(farmTypes.ObjectKind.Reset))
+return
+}
+if (transitionPending() || programBusy()) {
+directNext("Watch the helper repeat your current code.", -1)
+return
+}
+let area = currentProgress.area
+if (interior() > 0) {
+directNext(interior() == 1 ? "A at a counter: expand, upgrade or change appearance." : "A at a weapon stand to buy or equip. Exit below.",
+instructionTarget(interior() == 1 ? farmTypes.ObjectKind.Shop : farmTypes.ObjectKind.Armory))
+return
+}
+if (area == 0) {
+let destination = 1
+while (destination < 12 && currentProgress.cleared[destination]) destination += 1
+if (!currentProgress.unlocked[destination]) {
+directNext("Sell harvest, then open the stone gate to A" + destination + ".",
+instructionTarget(farmTypes.ObjectKind.SellBox))
+} else {
+directNext("A at soil bed " + destination + " to visit " + areaName(destination) + ".",
+instructionTarget(farmTypes.ObjectKind.Travel, destination))
+}
+return
+}
+let phase = currentProgress.phase[area]
+if (phase == farmTypes.Phase.Raid) {
+directNext("Defend the plants! Move close and press B to swing.", -1)
+return
+}
+if (phase == farmTypes.Phase.Farm || phase == farmTypes.Phase.Prep) {
+let task = farmTasks.guidanceTask(area)
+if (task == -1) {
+directNext("A at the spring to refill, then run watering again.", instructionTarget(farmTypes.ObjectKind.Spring))
+return
+}
+if (task > 0) {
+let verb = task == farmTypes.Task.Plant ? "plant" : task == farmTypes.Task.Water ? "water" : "work"
+directNext("Open R" + (recipeForFarm(area) < 10 ? "0" : "") + recipeForFarm(area)
++ "; use its full code. A at the blinking " + verb + " pad.",
+instructionTarget(farmTypes.ObjectKind.TaskStation, task))
+return
+}
+if (phase == farmTypes.Phase.Prep && area > 1) {
+let crop = area - 1
+if (!currentProgress.powerEarned[crop]) {
+directNext("Build " + cropName(crop) + " code from R" + (recipeForPower(area) < 10 ? "0" : "")
++ recipeForPower(area) + "; A at the blinking practice pad.",
+instructionTarget(farmTypes.ObjectKind.PracticePad, crop))
+return
+}
+if (area == 12 && !currentProgress.powerEarned[12]) {
+directNext("Open R16 for Stormbloom; A at its practice pad.", instructionTarget(farmTypes.ObjectKind.PracticePad, 12))
+return
+}
+let placed = false
+let companion = false
+for (let i = 0; i < currentProgress.placements.length; i++) {
+let p = currentProgress.placements[i]
+if (p.area == area && p.crop == crop) placed = true
+if (p.area == area && (p.crop == farmTypes.Crop.Sunbeam || p.crop == farmTypes.Crop.Sporecap)) companion = true
+}
+if (!placed || (area == 11 && !companion)) {
+directNext(!placed ? "A at a soil defender pad; place " + cropName(crop) + "."
+: "Place a Sunbeam or Sporecap beside Lanternleaf.", instructionTarget(farmTypes.ObjectKind.DefenderSlot))
+return
+}
+}
+directNext("A at the blinking shield pad to start the raid.", instructionTarget(farmTypes.ObjectKind.Ready))
+return
+}
+if (currentProgress.complete) {
+directNext("Farm complete! Harvest, upgrade or revisit your plants.", instructionTarget(farmTypes.ObjectKind.Harvest))
+return
+}
+let nextArea = Math.min(12, area + 1)
+if (currentProgress.unlocked[nextArea]) {
+let target = instructionTarget(farmTypes.ObjectKind.Exit, nextArea)
+if (target < 0) target = instructionTarget(farmTypes.ObjectKind.Travel, nextArea)
+directNext("Follow the path to A" + nextArea + " for the next farm job.", target)
+} else if (currentProgress.gold >= areaUnlockCost(nextArea)) {
+directNext("A at the stone gate to open A" + nextArea + ".", instructionTarget(farmTypes.ObjectKind.Barrier, nextArea))
+} else {
+let stock = 0
+for (let i = 1; i <= 12; i++) stock += currentProgress.inventory[i]
+directNext(stock > 0 ? "Go home and sell harvest; then open the next gate."
+: "A at a ripe plant to harvest. Sell harvest at home.",
+stock > 0 ? instructionTarget(farmTypes.ObjectKind.Travel, 0) : instructionTarget(farmTypes.ObjectKind.Harvest))
+}
 }
 
 function dispatchInteraction(object: farmTypes.WorldObject): void {
@@ -41015,6 +41623,10 @@ screen.fillRect(6, 6, 86, 20, 1)
 screen.print("HP " + playerHp, 12, 12, 15, image.font8)
 screen.fillRect(VIEWPORT_WIDTH - 124, 6, 118, 20, 1)
 screen.print("GOLD " + currentProgress.gold, VIEWPORT_WIDTH - 116, 12, 15, image.font8)
+if (!menuOpen && nextInstruction) {
+screen.fillRect(6, 30, VIEWPORT_WIDTH - 12, 30, 1)
+for (let i = 0; i < nextInstructionLines.length && i < 2; i++) screen.print(nextInstructionLines[i], 12, 35 + i * 10, 15, image.font8)
+}
 }
 
 function drawNotice(): void {
@@ -41061,8 +41673,9 @@ controller.left.onEvent(ControllerButtonEvent.Pressed, function () { if (menuOpe
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () { if (menuOpen) { if (quantityMenu) changeQuantity(-10); else moveMenu(1) } })
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () { if (menuOpen) { if (quantityMenu) changeQuantity(1); else moveMenu(1) } })
 game.onUpdate(updateWorld)
-// UI must draw after the authored tilemap and sprites.
-game.onShade(drawWorldUi)
+// Native onShade is below tall plant sprites. Keep the fixed HUD above
+// world/hero/weapon sprites, while native menus retain their higher layer.
+scene.createRenderable(20000, function () { drawWorldUi() })
 }
 
 function inwardEntryPoint(source: farmTypes.Layout, objectId: number): farmTypes.Point {
@@ -41096,6 +41709,7 @@ function ensurePlayer(position: farmTypes.Point): void {
 if (!currentPlayer) currentPlayer = sprites.create(farmArt.frame("player.walk.down", 0), PLAYER_KIND)
 else currentPlayer.setImage(farmArt.frame("player.walk.down", 0))
 currentPlayer.setPosition(position.x, position.y)
+currentPlayer.z = 10000
 farmAvatar.attach(currentPlayer)
 scene.cameraFollowSprite(currentPlayer)
 setPlayerMovement(!menuOpen)
@@ -41115,6 +41729,7 @@ ensurePlayer(inwardEntryPoint(next, entryObjectId))
 currentProgress.area = area
 farmTasks.enter(area)
 farmCombat.enter(area)
+updateNextInstruction()
 return true
 }
 
@@ -41127,7 +41742,9 @@ lastUpdateMs = control.millis()
 lastPeriodicCheckpointClock = currentProgress.playedMs
 clearPendingTransition()
 if (saveRecoveryMessage) showNotice(saveRecoveryMessage, RECOVERY_NOTICE_MS)
-openGreeting()
+// A code edit/restart resumes the saved region immediately. Appearance
+// remains available in the shop; greeting is only for a new character.
+if (!farmAvatar.saved()) openGreeting()
 }
 
 export function start(): void {
@@ -41183,6 +41800,15 @@ export function player(): Sprite {
 return currentPlayer
 }
 
+export function farmTaskEarned(task: number): boolean {
+return !!currentProgress && task >= 1 && task < currentProgress.farmEarned.length && currentProgress.farmEarned[task] > 0
+}
+
+export function plotCapacity(area: number): number {
+if (!currentProgress || area < 1 || area > 12) return 0
+return expansionProduction(area, currentProgress.expansion[area])
+}
+
 export function layout(): farmTypes.Layout {
 return currentLayout
 }
@@ -41213,6 +41839,7 @@ if (!acceptFreshResultToken(result.task, result.token)) return
 if (currentProgress.area != farmArea || currentProgress.phase[farmArea] != farmTypes.Phase.Farm) return
 if (result.code != farmTypes.ResultCode.Success) {
 resultFeedback(result)
+checkpoint("current-work-result")
 return
 }
 if (currentProgress.farmEarned[result.task]) return
@@ -41348,7 +41975,17 @@ written = farmSave.write(currentProgress, farm, raidRecoveryProgress, raidRecove
 } else {
 written = farmSave.write(currentProgress, farm)
 }
-if (written) lastPeriodicCheckpointClock = currentProgress.playedMs
+if (written) {
+lastPeriodicCheckpointClock = currentProgress.playedMs
+workDirty = false
+}
+}
+
+// Physical work is saved independently of code or invocation verdicts.
+// Coalesce operations so long loops do not write three settings keys per item.
+export function dirtyWork(): void {
+if (!workDirty) workDirtySince = control.millis()
+workDirty = true
 }
 
 export function clock(): number {
