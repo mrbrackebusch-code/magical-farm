@@ -20217,11 +20217,15 @@ let padImages: Image[] = []
 let guidance: Sprite = null
 let guidanceImage: Image = null
 let guidanceReadyImage: Image = null
+let guidanceEdgeImages: Image[] = []
 let guidanceReady = false
 let guidanceLayout: farmTypes.Layout = null
 let guidanceId = -1
 let guidanceElapsed = 0
 let guidanceActive = false
+let guidanceTarget: farmTypes.WorldObject = null
+let guidanceOffscreen = false
+let guidanceDirection = 0
 
 // Code-native symbols, cached once: sprout, water drop, raid shield,
 // harvest fruit and work tool. No words or gameplay hitboxes in these pads.
@@ -20291,6 +20295,7 @@ if (layout && targetObjectId > 0) for (let i = 0; i < layout.objects.length; i++
 if (layout.objects[i].id == targetObjectId) target = layout.objects[i]
 }
 if (!target) {
+guidanceTarget = null
 if (guidance) guidance.setFlag(SpriteFlag.Invisible, true)
 return
 }
@@ -20315,14 +20320,64 @@ guidanceReadyImage.fillRect(5, 14, 10, 9, 14)
 guidanceReadyImage.print("A", 7, 14, 15, image.font8)
 }
 if (!guidance) {
+// Bake the eight bearings once; movement allocates no images.
+for (let direction = 0; direction < 8; direction++) edgeArrow(direction)
 guidance = sprites.create(guidanceImage, kind)
 guidance.setFlag(SpriteFlag.Ghost, true)
-guidance.z = 9000
+guidance.setFlag(SpriteFlag.RelativeToCamera, true)
+guidance.z = 19000
 }
-guidance.setImage(guidanceImage)
-guidance.setPosition(target.x, target.y - 26)
+guidanceTarget = target
 guidance.setFlag(SpriteFlag.Invisible, false)
 guidanceActive = true
+positionGuidance()
+}
+
+function edgeArrow(direction: number): Image {
+if (guidanceEdgeImages[direction]) return guidanceEdgeImages[direction]
+let arrow = image.create(24, 24)
+let angle = direction * Math.PI / 4
+let cos = Math.cos(angle)
+let sin = Math.sin(angle)
+for (let y = 0; y < 14; y++) for (let x = 0; x < 20; x++) {
+let color = guidanceImage.getPixel(x, y)
+if (!color) continue
+let dx = x - 9.5
+let dy = y - 6.5
+arrow.setPixel(Math.round(11.5 + dx * cos + dy * sin), Math.round(11.5 + dy * cos - dx * sin), color)
+}
+guidanceEdgeImages[direction] = arrow
+return arrow
+}
+
+function positionGuidance(): void {
+if (!guidance || !guidanceActive || !guidanceTarget) return
+// Native camera limits at map edges mean player-centered estimates drift.
+// Project the actual authored target through the current Arcade camera.
+let x = guidanceTarget.x - scene.cameraProperty(CameraProperty.Left)
+let y = guidanceTarget.y - scene.cameraProperty(CameraProperty.Top)
+let left = 14
+let right = screen.width - 14
+let top = farmHud.topInset() + 16
+let bottom = screen.height - 16
+guidanceOffscreen = x < left || x > right || y < top || y > bottom
+if (!guidanceOffscreen) {
+guidance.setImage(guidanceReady ? guidanceReadyImage : guidanceImage)
+guidance.setPosition(Math.max(left, Math.min(right, x)), Math.max(top, y - 26))
+return
+}
+let centerX = (left + right) / 2
+let centerY = (top + bottom) / 2
+let dx = x - centerX
+let dy = y - centerY
+let scaleX = dx == 0 ? 10000 : (right - left) / 2 / Math.abs(dx)
+let scaleY = dy == 0 ? 10000 : (bottom - top) / 2 / Math.abs(dy)
+let scale = Math.min(scaleX, scaleY)
+if (Math.abs(dx) > Math.abs(dy) * 2) guidanceDirection = dx > 0 ? 2 : 6
+else if (Math.abs(dy) > Math.abs(dx) * 2) guidanceDirection = dy > 0 ? 0 : 4
+else guidanceDirection = dy > 0 ? (dx > 0 ? 1 : 7) : (dx > 0 ? 3 : 5)
+guidance.setImage(edgeArrow(guidanceDirection))
+guidance.setPosition(centerX + dx * scale, centerY + dy * scale)
 }
 
 // Root supplies the actual nearest-facing interaction eligibility. Color
@@ -20331,7 +20386,7 @@ export function nextActionReady(ready: boolean): void {
 if (!guidance || !guidanceActive || guidanceReady == ready) return
 guidanceReady = ready
 guidanceElapsed = 0
-guidance.setImage(ready ? guidanceReadyImage : guidanceImage)
+positionGuidance()
 guidance.setFlag(SpriteFlag.Invisible, false)
 }
 
@@ -20339,7 +20394,8 @@ guidance.setFlag(SpriteFlag.Invisible, false)
 // timers, controller callbacks, images or sprites are allocated here.
 export function pulse(dtMs: number): void {
 if (!guidance || !guidanceActive) return
-if (guidanceReady) {
+positionGuidance()
+if (guidanceReady || guidanceOffscreen) {
 guidance.setFlag(SpriteFlag.Invisible, false)
 return
 }
@@ -20400,7 +20456,10 @@ return result
 }
 for (let i = 0; i < layout.objects.length; i++) {
 let o = layout.objects[i]
-if (o.kind != farmTypes.ObjectKind.TaskStation && o.kind != farmTypes.ObjectKind.Ready && o.kind != farmTypes.ObjectKind.PracticePad) continue
+let harvest = o.kind == farmTypes.ObjectKind.Harvest
+&& progress && progress.phase[layout.area] == farmTypes.Phase.Production
+&& o.arg <= farmWorld.plotCapacity(layout.area)
+if (o.kind != farmTypes.ObjectKind.TaskStation && o.kind != farmTypes.ObjectKind.Ready && o.kind != farmTypes.ObjectKind.PracticePad && !harvest) continue
 let pad = sprites.create(actionPad(o), kind)
 pad.setFlag(SpriteFlag.Ghost, true)
 pad.setPosition(o.x, o.y)
@@ -20594,6 +20653,11 @@ function positionHud(): void {
 let height = farmUiTheme.naturalHeight(surface)
 surface.setDimensions(screen.width, height)
 surface.setPosition(screen.width / 2, height / 2)
+}
+
+// Keep map guidance below the actual wrapped stock HUD, not a guessed box.
+export function topInset(): number {
+return surface ? surface.height : 0
 }
 
 function text(row: number, value: string): void {
@@ -22167,16 +22231,16 @@ l.taskTiles = [
 l.objects = []
 l.objects.push(worldObject(1, 1, 8, 504, 0, 1))
 l.objects.push(worldObject(2, 8, 616, 168, 1, 0))
-l.objects.push(worldObject(101, 9, 312, 88, 1, 1))
-l.objects.push(worldObject(102, 9, 344, 88, 2, 1))
-l.objects.push(worldObject(103, 9, 376, 88, 3, 1))
-l.objects.push(worldObject(104, 9, 408, 88, 4, 1))
-l.objects.push(worldObject(105, 9, 440, 88, 5, 1))
-l.objects.push(worldObject(106, 9, 472, 88, 6, 1))
-l.objects.push(worldObject(107, 9, 232, 88, 7, 1))
-l.objects.push(worldObject(108, 9, 264, 88, 8, 1))
-l.objects.push(worldObject(109, 9, 520, 88, 9, 1))
-l.objects.push(worldObject(110, 9, 552, 88, 10, 1))
+l.objects.push(worldObject(101, 9, 232, 136, 1, 1))
+l.objects.push(worldObject(102, 9, 344, 136, 2, 1))
+l.objects.push(worldObject(103, 9, 376, 184, 3, 1))
+l.objects.push(worldObject(104, 9, 408, 136, 4, 1))
+l.objects.push(worldObject(105, 9, 440, 184, 5, 1))
+l.objects.push(worldObject(106, 9, 456, 136, 6, 1))
+l.objects.push(worldObject(107, 9, 184, 88, 7, 1))
+l.objects.push(worldObject(108, 9, 184, 136, 8, 1))
+l.objects.push(worldObject(109, 9, 552, 136, 9, 1))
+l.objects.push(worldObject(110, 9, 600, 88, 10, 1))
 l.objects.push(worldObject(201, 10, 328, 456, 1, 0))
 l.objects.push(worldObject(202, 10, 456, 456, 2, 0))
 l.objects.push(worldObject(203, 10, 312, 392, 3, 0))
@@ -22269,7 +22333,7 @@ l.masks.push(mask(8, 1, 8, [
 return l
 }
 
-// LAYOUT area=2 name=Fence & Trellis Path size=52x40 objects=26 crops=6 D=12 routes=2 masks=12
+// LAYOUT area=2 name=Fence & Trellis Path size=52x40 objects=22 crops=6 D=12 routes=2 masks=12
 function area2(): farmTypes.Layout {
 let l = new farmTypes.Layout()
 l.area = 2; l.width = 52; l.height = 40; l.entry = point(776, 104)
@@ -22417,17 +22481,12 @@ l.objects = []
 l.objects.push(worldObject(1, 1, 824, 104, 0, 2))
 l.objects.push(worldObject(2, 8, 232, 136, 2, 0))
 l.objects.push(worldObject(11, 7, 168, 184, 3, 1))
-l.objects.push(worldObject(12, 7, 168, 248, 3, 2))
-l.objects.push(worldObject(13, 7, 168, 312, 3, 3))
-l.objects.push(worldObject(14, 7, 168, 376, 3, 4))
-l.objects.push(worldObject(15, 7, 168, 440, 3, 5))
-l.objects.push(worldObject(16, 7, 168, 488, 3, 6))
-l.objects.push(worldObject(101, 9, 88, 200, 1, 2))
-l.objects.push(worldObject(102, 9, 88, 264, 2, 2))
-l.objects.push(worldObject(103, 9, 88, 328, 3, 2))
-l.objects.push(worldObject(104, 9, 88, 392, 4, 2))
-l.objects.push(worldObject(105, 9, 88, 456, 5, 2))
-l.objects.push(worldObject(106, 9, 88, 520, 6, 2))
+l.objects.push(worldObject(101, 9, 88, 152, 1, 2))
+l.objects.push(worldObject(102, 9, 40, 264, 2, 2))
+l.objects.push(worldObject(103, 9, 40, 328, 3, 2))
+l.objects.push(worldObject(104, 9, 40, 392, 4, 2))
+l.objects.push(worldObject(105, 9, 40, 456, 5, 2))
+l.objects.push(worldObject(106, 9, 88, 568, 6, 2))
 l.objects.push(worldObject(201, 10, 392, 536, 1, 0))
 l.objects.push(worldObject(202, 10, 520, 536, 2, 0))
 l.objects.push(worldObject(203, 10, 648, 536, 3, 0))
@@ -22440,6 +22499,7 @@ l.objects.push(worldObject(209, 10, 616, 248, 9, 0))
 l.objects.push(worldObject(210, 10, 488, 248, 10, 0))
 l.objects.push(worldObject(211, 10, 360, 248, 11, 0))
 l.objects.push(worldObject(212, 10, 232, 248, 12, 0))
+l.objects.push(worldObject(400, 12, 232, 88, 1, 0))
 l.defenderSlots = []
 l.defenderSlots.push(slot(1, 1740, [
 1580, 1581, 1582, 1583, 1584, 1585, 1586, 1587, 1588, 1589, 1590, 1591, 1632, 1684, 1736, 1788, 1840, 1892, 1893, 1894, 1895, 1896, 1897, 1898,
@@ -22586,7 +22646,7 @@ l.masks.push(mask(12, 1, 8, [
 return l
 }
 
-// LAYOUT area=3 name=Berry Patch size=52x40 objects=28 crops=6 D=16 routes=2 masks=16
+// LAYOUT area=3 name=Berry Patch size=52x40 objects=26 crops=6 D=16 routes=2 masks=16
 function area3(): farmTypes.Layout {
 let l = new farmTypes.Layout()
 l.area = 3; l.width = 52; l.height = 40; l.entry = point(424, 584)
@@ -22734,15 +22794,12 @@ l.objects = []
 l.objects.push(worldObject(1, 1, 424, 632, 0, 3))
 l.objects.push(worldObject(2, 8, 584, 440, 3, 0))
 l.objects.push(worldObject(11, 7, 328, 328, 4, 1))
-l.objects.push(worldObject(12, 7, 520, 328, 4, 2))
-l.objects.push(worldObject(13, 7, 328, 392, 4, 3))
-l.objects.push(worldObject(14, 7, 520, 392, 4, 4))
-l.objects.push(worldObject(101, 9, 392, 328, 1, 3))
-l.objects.push(worldObject(102, 9, 456, 328, 2, 3))
-l.objects.push(worldObject(103, 9, 392, 392, 3, 3))
-l.objects.push(worldObject(104, 9, 456, 392, 4, 3))
-l.objects.push(worldObject(105, 9, 392, 456, 5, 3))
-l.objects.push(worldObject(106, 9, 456, 456, 6, 3))
+l.objects.push(worldObject(101, 9, 312, 280, 1, 3))
+l.objects.push(worldObject(102, 9, 536, 280, 2, 3))
+l.objects.push(worldObject(103, 9, 344, 440, 3, 3))
+l.objects.push(worldObject(104, 9, 504, 440, 4, 3))
+l.objects.push(worldObject(105, 9, 392, 504, 5, 3))
+l.objects.push(worldObject(106, 9, 456, 504, 6, 3))
 l.objects.push(worldObject(201, 10, 200, 72, 1, 0))
 l.objects.push(worldObject(202, 10, 280, 88, 2, 0))
 l.objects.push(worldObject(203, 10, 168, 168, 3, 0))
@@ -22759,6 +22816,7 @@ l.objects.push(worldObject(213, 10, 360, 200, 13, 0))
 l.objects.push(worldObject(214, 10, 488, 200, 14, 0))
 l.objects.push(worldObject(215, 10, 376, 248, 15, 0))
 l.objects.push(worldObject(216, 10, 472, 248, 16, 0))
+l.objects.push(worldObject(400, 12, 584, 392, 2, 0))
 l.defenderSlots = []
 l.defenderSlots.push(slot(1, 220, [
 9, 61, 113, 165, 217, 269, 321, 373, 374, 375, 376, 377, 378, 430, 482, 534, 586, 587
@@ -22905,7 +22963,7 @@ l.masks.push(mask(16, 1, 8, [
 return l
 }
 
-// LAYOUT area=4 name=Bloom Forge size=56x42 objects=30 crops=7 D=16 routes=1 masks=32
+// LAYOUT area=4 name=Bloom Forge size=56x42 objects=27 crops=7 D=16 routes=1 masks=32
 function area4(): farmTypes.Layout {
 let l = new farmTypes.Layout()
 l.area = 4; l.width = 56; l.height = 42; l.entry = point(456, 616)
@@ -23070,18 +23128,14 @@ l.taskTiles = [
 l.objects = []
 l.objects.push(worldObject(1, 1, 456, 664, 0, 4))
 l.objects.push(worldObject(2, 8, 776, 616, 4, 0))
-l.objects.push(worldObject(11, 7, 824, 136, 5, 1))
-l.objects.push(worldObject(12, 7, 824, 200, 5, 2))
-l.objects.push(worldObject(13, 7, 824, 264, 5, 3))
-l.objects.push(worldObject(14, 7, 824, 328, 5, 4))
-l.objects.push(worldObject(15, 7, 824, 392, 5, 5))
-l.objects.push(worldObject(101, 9, 824, 136, 1, 4))
-l.objects.push(worldObject(102, 9, 824, 200, 2, 4))
-l.objects.push(worldObject(103, 9, 824, 264, 3, 4))
-l.objects.push(worldObject(104, 9, 824, 328, 4, 4))
-l.objects.push(worldObject(105, 9, 824, 392, 5, 4))
-l.objects.push(worldObject(106, 9, 824, 488, 6, 4))
-l.objects.push(worldObject(107, 9, 824, 552, 7, 4))
+l.objects.push(worldObject(11, 7, 824, 88, 5, 1))
+l.objects.push(worldObject(101, 9, 776, 136, 1, 4))
+l.objects.push(worldObject(102, 9, 728, 200, 2, 4))
+l.objects.push(worldObject(103, 9, 728, 312, 3, 4))
+l.objects.push(worldObject(104, 9, 776, 408, 4, 4))
+l.objects.push(worldObject(105, 9, 728, 392, 5, 4))
+l.objects.push(worldObject(106, 9, 776, 504, 6, 4))
+l.objects.push(worldObject(107, 9, 824, 600, 7, 4))
 l.objects.push(worldObject(201, 10, 72, 536, 1, 0))
 l.objects.push(worldObject(202, 10, 168, 552, 2, 0))
 l.objects.push(worldObject(203, 10, 248, 472, 3, 0))
@@ -23098,6 +23152,7 @@ l.objects.push(worldObject(213, 10, 248, 280, 13, 0))
 l.objects.push(worldObject(214, 10, 392, 280, 14, 0))
 l.objects.push(worldObject(215, 10, 552, 216, 15, 0))
 l.objects.push(worldObject(216, 10, 744, 264, 16, 0))
+l.objects.push(worldObject(400, 12, 776, 568, 3, 0))
 l.defenderSlots = []
 l.defenderSlots.push(slot(1, 1852, [
 1743, 1744, 1745, 1746, 1747, 1799, 1855, 1911, 1967, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023
@@ -23292,7 +23347,7 @@ l.masks.push(mask(16, 2, 6, [
 return l
 }
 
-// LAYOUT area=5 name=Overgrown Field size=56x42 objects=36 crops=10 D=16 routes=2 masks=32
+// LAYOUT area=5 name=Overgrown Field size=56x42 objects=30 crops=10 D=16 routes=2 masks=32
 function area5(): farmTypes.Layout {
 let l = new farmTypes.Layout()
 l.area = 5; l.width = 56; l.height = 42; l.entry = point(440, 616)
@@ -23457,24 +23512,17 @@ l.taskTiles = [
 l.objects = []
 l.objects.push(worldObject(1, 1, 440, 664, 0, 5))
 l.objects.push(worldObject(2, 8, 296, 600, 5, 0))
-l.objects.push(worldObject(11, 7, 88, 88, 6, 1))
-l.objects.push(worldObject(12, 7, 136, 88, 6, 2))
-l.objects.push(worldObject(13, 7, 184, 88, 6, 3))
-l.objects.push(worldObject(14, 7, 232, 88, 6, 4))
-l.objects.push(worldObject(15, 7, 88, 136, 6, 5))
-l.objects.push(worldObject(16, 7, 136, 136, 6, 6))
-l.objects.push(worldObject(17, 7, 184, 136, 6, 7))
-l.objects.push(worldObject(18, 7, 232, 136, 6, 8))
-l.objects.push(worldObject(101, 9, 88, 88, 1, 5))
-l.objects.push(worldObject(102, 9, 136, 88, 2, 5))
-l.objects.push(worldObject(103, 9, 184, 88, 3, 5))
-l.objects.push(worldObject(104, 9, 232, 88, 4, 5))
-l.objects.push(worldObject(105, 9, 88, 136, 5, 5))
-l.objects.push(worldObject(106, 9, 136, 136, 6, 5))
-l.objects.push(worldObject(107, 9, 184, 136, 7, 5))
-l.objects.push(worldObject(108, 9, 232, 136, 8, 5))
-l.objects.push(worldObject(109, 9, 88, 184, 9, 5))
-l.objects.push(worldObject(110, 9, 136, 184, 10, 5))
+l.objects.push(worldObject(11, 7, 40, 136, 6, 1))
+l.objects.push(worldObject(101, 9, 40, 88, 1, 5))
+l.objects.push(worldObject(102, 9, 40, 232, 2, 5))
+l.objects.push(worldObject(103, 9, 280, 104, 3, 5))
+l.objects.push(worldObject(104, 9, 280, 152, 4, 5))
+l.objects.push(worldObject(105, 9, 40, 184, 5, 5))
+l.objects.push(worldObject(106, 9, 136, 232, 6, 5))
+l.objects.push(worldObject(107, 9, 248, 248, 7, 5))
+l.objects.push(worldObject(108, 9, 328, 136, 8, 5))
+l.objects.push(worldObject(109, 9, 88, 232, 9, 5))
+l.objects.push(worldObject(110, 9, 136, 280, 10, 5))
 l.objects.push(worldObject(201, 10, 136, 520, 1, 0))
 l.objects.push(worldObject(202, 10, 248, 520, 2, 0))
 l.objects.push(worldObject(203, 10, 168, 424, 3, 0))
@@ -23491,6 +23539,7 @@ l.objects.push(worldObject(213, 10, 552, 328, 13, 0))
 l.objects.push(worldObject(214, 10, 472, 264, 14, 0))
 l.objects.push(worldObject(215, 10, 440, 328, 15, 0))
 l.objects.push(worldObject(216, 10, 456, 232, 16, 0))
+l.objects.push(worldObject(400, 12, 296, 552, 4, 0))
 l.defenderSlots = []
 l.defenderSlots.push(slot(1, 1800, [
 1581, 1582, 1637, 1693, 1749, 1805, 1861, 1910, 1911, 1912, 1913, 1914, 1915, 1916, 1917, 1966, 2022, 2078, 2134, 2190
@@ -23693,7 +23742,7 @@ l.masks.push(mask(16, 2, 6, [
 return l
 }
 
-// LAYOUT area=6 name=Dry Terrace size=56x44 objects=29 crops=9 D=16 routes=1 masks=219
+// LAYOUT area=6 name=Dry Terrace size=56x44 objects=30 crops=9 D=16 routes=1 masks=219
 function area6(): farmTypes.Layout {
 let l = new farmTypes.Layout()
 l.area = 6; l.width = 56; l.height = 44; l.entry = point(56, 648)
@@ -23863,18 +23912,18 @@ l.taskTiles = [
 ]
 l.objects = []
 l.objects.push(worldObject(1, 1, 8, 648, 0, 6))
-l.objects.push(worldObject(2, 8, 760, 152, 6, 0))
+l.objects.push(worldObject(2, 8, 776, 152, 6, 0))
 l.objects.push(worldObject(3, 11, 136, 232, 6, 4))
 l.objects.push(worldObject(4, 7, 152, 168, 7, 0))
-l.objects.push(worldObject(101, 9, 328, 88, 1, 6))
-l.objects.push(worldObject(102, 9, 376, 88, 2, 6))
-l.objects.push(worldObject(103, 9, 424, 88, 3, 6))
-l.objects.push(worldObject(104, 9, 472, 88, 4, 6))
-l.objects.push(worldObject(105, 9, 520, 88, 5, 6))
-l.objects.push(worldObject(106, 9, 568, 88, 6, 6))
-l.objects.push(worldObject(107, 9, 616, 88, 7, 6))
-l.objects.push(worldObject(108, 9, 680, 136, 8, 6))
-l.objects.push(worldObject(109, 9, 728, 136, 9, 6))
+l.objects.push(worldObject(101, 9, 280, 88, 1, 6))
+l.objects.push(worldObject(102, 9, 376, 136, 2, 6))
+l.objects.push(worldObject(103, 9, 328, 136, 3, 6))
+l.objects.push(worldObject(104, 9, 472, 136, 4, 6))
+l.objects.push(worldObject(105, 9, 520, 136, 5, 6))
+l.objects.push(worldObject(106, 9, 568, 136, 6, 6))
+l.objects.push(worldObject(107, 9, 664, 88, 7, 6))
+l.objects.push(worldObject(108, 9, 632, 136, 8, 6))
+l.objects.push(worldObject(109, 9, 728, 88, 9, 6))
 l.objects.push(worldObject(201, 10, 728, 632, 1, 0))
 l.objects.push(worldObject(202, 10, 568, 584, 2, 0))
 l.objects.push(worldObject(203, 10, 392, 632, 3, 0))
@@ -23891,6 +23940,7 @@ l.objects.push(worldObject(213, 10, 296, 328, 13, 0))
 l.objects.push(worldObject(214, 10, 488, 296, 14, 0))
 l.objects.push(worldObject(215, 10, 648, 328, 15, 0))
 l.objects.push(worldObject(216, 10, 552, 200, 16, 0))
+l.objects.push(worldObject(400, 12, 728, 184, 5, 0))
 l.defenderSlots = []
 l.defenderSlots.push(slot(1, 2229, [
 1781, 2110, 2111, 2112, 2113, 2114, 2115, 2116, 2117, 2118, 2119, 2120, 2121, 2177, 2233, 2289, 2345, 2401, 2457
@@ -24662,7 +24712,7 @@ l.masks.push(mask(2457, 3, 1, [
 return l
 }
 
-// LAYOUT area=7 name=Orchard Lane size=58x44 objects=28 crops=6 D=16 routes=2 masks=140
+// LAYOUT area=7 name=Orchard Lane size=58x44 objects=26 crops=6 D=16 routes=2 masks=140
 function area7(): farmTypes.Layout {
 let l = new farmTypes.Layout()
 l.area = 7; l.width = 58; l.height = 44; l.entry = point(56, 648)
@@ -24840,15 +24890,12 @@ l.objects = []
 l.objects.push(worldObject(1, 1, 8, 648, 0, 7))
 l.objects.push(worldObject(2, 8, 792, 632, 7, 0))
 l.objects.push(worldObject(11, 7, 296, 584, 8, 1))
-l.objects.push(worldObject(12, 7, 408, 584, 8, 2))
-l.objects.push(worldObject(13, 7, 520, 584, 8, 3))
-l.objects.push(worldObject(14, 7, 632, 584, 8, 4))
-l.objects.push(worldObject(101, 9, 296, 632, 1, 7))
-l.objects.push(worldObject(102, 9, 408, 632, 2, 7))
-l.objects.push(worldObject(103, 9, 520, 632, 3, 7))
-l.objects.push(worldObject(104, 9, 632, 632, 4, 7))
-l.objects.push(worldObject(105, 9, 216, 664, 5, 7))
-l.objects.push(worldObject(106, 9, 712, 664, 6, 7))
+l.objects.push(worldObject(101, 9, 344, 632, 1, 7))
+l.objects.push(worldObject(102, 9, 456, 632, 2, 7))
+l.objects.push(worldObject(103, 9, 568, 632, 3, 7))
+l.objects.push(worldObject(104, 9, 680, 616, 4, 7))
+l.objects.push(worldObject(105, 9, 216, 616, 5, 7))
+l.objects.push(worldObject(106, 9, 728, 616, 6, 7))
 l.objects.push(worldObject(201, 10, 184, 88, 1, 0))
 l.objects.push(worldObject(202, 10, 280, 152, 2, 0))
 l.objects.push(worldObject(203, 10, 184, 248, 3, 0))
@@ -24865,6 +24912,7 @@ l.objects.push(worldObject(213, 10, 392, 472, 13, 0))
 l.objects.push(worldObject(214, 10, 520, 472, 14, 0))
 l.objects.push(worldObject(215, 10, 376, 552, 15, 0))
 l.objects.push(worldObject(216, 10, 568, 552, 16, 0))
+l.objects.push(worldObject(400, 12, 792, 584, 6, 0))
 l.defenderSlots = []
 l.defenderSlots.push(slot(1, 301, [
 8, 66, 124, 182, 240, 298, 356, 414, 415, 416, 417, 418, 419, 420, 421, 479, 537, 595, 653
@@ -25385,7 +25433,7 @@ l.masks.push(mask(2058, 3, 1, [
 return l
 }
 
-// LAYOUT area=8 name=Animal Meadow size=60x42 objects=34 crops=8 D=18 routes=3 masks=307
+// LAYOUT area=8 name=Animal Meadow size=60x42 objects=30 crops=8 D=18 routes=3 masks=307
 function area8(): farmTypes.Layout {
 let l = new farmTypes.Layout()
 l.area = 8; l.width = 60; l.height = 42; l.entry = point(488, 616)
@@ -25561,19 +25609,14 @@ l.objects = []
 l.objects.push(worldObject(1, 1, 488, 664, 0, 8))
 l.objects.push(worldObject(2, 8, 792, 616, 8, 0))
 l.objects.push(worldObject(11, 7, 824, 120, 9, 1))
-l.objects.push(worldObject(12, 7, 824, 200, 9, 2))
-l.objects.push(worldObject(13, 7, 824, 280, 9, 3))
-l.objects.push(worldObject(14, 7, 824, 360, 9, 4))
-l.objects.push(worldObject(15, 7, 824, 440, 9, 5))
-l.objects.push(worldObject(16, 7, 824, 520, 9, 6))
-l.objects.push(worldObject(101, 9, 888, 120, 1, 8))
-l.objects.push(worldObject(102, 9, 888, 200, 2, 8))
-l.objects.push(worldObject(103, 9, 888, 280, 3, 8))
-l.objects.push(worldObject(104, 9, 888, 360, 4, 8))
-l.objects.push(worldObject(105, 9, 888, 440, 5, 8))
-l.objects.push(worldObject(106, 9, 888, 520, 6, 8))
-l.objects.push(worldObject(107, 9, 856, 600, 7, 8))
-l.objects.push(worldObject(108, 9, 920, 600, 8, 8))
+l.objects.push(worldObject(101, 9, 840, 168, 1, 8))
+l.objects.push(worldObject(102, 9, 776, 248, 2, 8))
+l.objects.push(worldObject(103, 9, 776, 296, 3, 8))
+l.objects.push(worldObject(104, 9, 776, 408, 4, 8))
+l.objects.push(worldObject(105, 9, 776, 456, 5, 8))
+l.objects.push(worldObject(106, 9, 728, 488, 6, 8))
+l.objects.push(worldObject(107, 9, 744, 600, 7, 8))
+l.objects.push(worldObject(108, 9, 696, 600, 8, 8))
 l.objects.push(worldObject(201, 10, 104, 104, 1, 0))
 l.objects.push(worldObject(202, 10, 232, 184, 2, 0))
 l.objects.push(worldObject(203, 10, 376, 136, 3, 0))
@@ -25592,6 +25635,7 @@ l.objects.push(worldObject(215, 10, 376, 456, 15, 0))
 l.objects.push(worldObject(216, 10, 504, 552, 16, 0))
 l.objects.push(worldObject(217, 10, 632, 472, 17, 0))
 l.objects.push(worldObject(218, 10, 744, 552, 18, 0))
+l.objects.push(worldObject(400, 12, 792, 568, 7, 0))
 l.defenderSlots = []
 l.defenderSlots.push(slot(1, 366, [
 480, 481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 491, 492, 493
@@ -26586,7 +26630,7 @@ l.masks.push(mask(18, 4, 6, [
 return l
 }
 
-// LAYOUT area=9 name=Greenhouse Grid size=60x46 objects=39 crops=16 D=18 routes=2 masks=252
+// LAYOUT area=9 name=Greenhouse Grid size=60x46 objects=38 crops=16 D=18 routes=2 masks=252
 function area9(): farmTypes.Layout {
 let l = new farmTypes.Layout()
 l.area = 9; l.width = 60; l.height = 46; l.entry = point(488, 680)
@@ -26776,26 +26820,24 @@ l.taskTiles = [
 ]
 l.objects = []
 l.objects.push(worldObject(1, 1, 488, 728, 0, 9))
-l.objects.push(worldObject(2, 8, 488, 616, 9, 0))
+l.objects.push(worldObject(2, 8, 488, 648, 9, 0))
 l.objects.push(worldObject(11, 7, 312, 248, 10, 1))
-l.objects.push(worldObject(12, 7, 312, 360, 10, 2))
-l.objects.push(worldObject(13, 7, 312, 472, 10, 3))
-l.objects.push(worldObject(101, 9, 360, 248, 1, 9))
-l.objects.push(worldObject(102, 9, 424, 248, 2, 9))
-l.objects.push(worldObject(103, 9, 488, 248, 3, 9))
-l.objects.push(worldObject(104, 9, 552, 248, 4, 9))
-l.objects.push(worldObject(105, 9, 360, 360, 5, 9))
-l.objects.push(worldObject(106, 9, 424, 360, 6, 9))
-l.objects.push(worldObject(107, 9, 488, 360, 7, 9))
-l.objects.push(worldObject(108, 9, 552, 360, 8, 9))
-l.objects.push(worldObject(109, 9, 360, 472, 9, 9))
-l.objects.push(worldObject(110, 9, 424, 472, 10, 9))
-l.objects.push(worldObject(111, 9, 488, 472, 11, 9))
-l.objects.push(worldObject(112, 9, 552, 472, 12, 9))
-l.objects.push(worldObject(113, 9, 712, 312, 13, 9))
-l.objects.push(worldObject(114, 9, 760, 312, 14, 9))
-l.objects.push(worldObject(115, 9, 808, 312, 15, 9))
-l.objects.push(worldObject(116, 9, 856, 312, 16, 9))
+l.objects.push(worldObject(101, 9, 360, 200, 1, 9))
+l.objects.push(worldObject(102, 9, 424, 200, 2, 9))
+l.objects.push(worldObject(103, 9, 488, 200, 3, 9))
+l.objects.push(worldObject(104, 9, 552, 200, 4, 9))
+l.objects.push(worldObject(105, 9, 360, 312, 5, 9))
+l.objects.push(worldObject(106, 9, 424, 312, 6, 9))
+l.objects.push(worldObject(107, 9, 488, 312, 7, 9))
+l.objects.push(worldObject(108, 9, 552, 312, 8, 9))
+l.objects.push(worldObject(109, 9, 360, 424, 9, 9))
+l.objects.push(worldObject(110, 9, 424, 424, 10, 9))
+l.objects.push(worldObject(111, 9, 488, 424, 11, 9))
+l.objects.push(worldObject(112, 9, 552, 424, 12, 9))
+l.objects.push(worldObject(113, 9, 712, 264, 13, 9))
+l.objects.push(worldObject(114, 9, 760, 360, 14, 9))
+l.objects.push(worldObject(115, 9, 808, 264, 15, 9))
+l.objects.push(worldObject(116, 9, 856, 264, 16, 9))
 l.objects.push(worldObject(201, 10, 184, 88, 1, 0))
 l.objects.push(worldObject(202, 10, 264, 168, 2, 0))
 l.objects.push(worldObject(203, 10, 200, 248, 3, 0))
@@ -26814,6 +26856,7 @@ l.objects.push(worldObject(215, 10, 376, 632, 15, 0))
 l.objects.push(worldObject(216, 10, 456, 600, 16, 0))
 l.objects.push(worldObject(217, 10, 536, 600, 17, 0))
 l.objects.push(worldObject(218, 10, 616, 632, 18, 0))
+l.objects.push(worldObject(400, 12, 440, 648, 8, 0))
 l.defenderSlots = []
 l.defenderSlots.push(slot(1, 311, [
 8, 68, 128, 188, 248, 308, 368, 428, 429, 430, 431, 432, 433, 434, 494, 554, 614, 674, 734
@@ -27628,7 +27671,7 @@ l.masks.push(mask(18, 4, 6, [
 return l
 }
 
-// LAYOUT area=10 name=Wash House size=60x44 objects=36 crops=9 D=18 routes=2 masks=256
+// LAYOUT area=10 name=Wash House size=60x44 objects=31 crops=9 D=18 routes=2 masks=256
 function area10(): farmTypes.Layout {
 let l = new farmTypes.Layout()
 l.area = 10; l.width = 60; l.height = 44; l.entry = point(904, 648)
@@ -27810,23 +27853,17 @@ l.taskTiles = [
 ]
 l.objects = []
 l.objects.push(worldObject(1, 1, 952, 648, 0, 10))
-l.objects.push(worldObject(2, 8, 328, 648, 10, 0))
+l.objects.push(worldObject(2, 8, 328, 664, 10, 0))
 l.objects.push(worldObject(11, 7, 488, 232, 11, 1))
-l.objects.push(worldObject(12, 7, 488, 280, 11, 2))
-l.objects.push(worldObject(13, 7, 488, 328, 11, 3))
-l.objects.push(worldObject(14, 7, 488, 376, 11, 4))
-l.objects.push(worldObject(15, 7, 488, 424, 11, 5))
-l.objects.push(worldObject(16, 7, 488, 472, 11, 6))
-l.objects.push(worldObject(17, 7, 488, 520, 11, 7))
-l.objects.push(worldObject(101, 9, 120, 552, 1, 10))
-l.objects.push(worldObject(102, 9, 184, 552, 2, 10))
-l.objects.push(worldObject(103, 9, 248, 552, 3, 10))
-l.objects.push(worldObject(104, 9, 120, 616, 4, 10))
-l.objects.push(worldObject(105, 9, 184, 616, 5, 10))
-l.objects.push(worldObject(106, 9, 248, 616, 6, 10))
-l.objects.push(worldObject(107, 9, 312, 616, 7, 10))
-l.objects.push(worldObject(108, 9, 120, 664, 8, 10))
-l.objects.push(worldObject(109, 9, 184, 664, 9, 10))
+l.objects.push(worldObject(101, 9, 120, 504, 1, 10))
+l.objects.push(worldObject(102, 9, 184, 504, 2, 10))
+l.objects.push(worldObject(103, 9, 248, 504, 3, 10))
+l.objects.push(worldObject(104, 9, 72, 616, 4, 10))
+l.objects.push(worldObject(105, 9, 232, 664, 5, 10))
+l.objects.push(worldObject(106, 9, 280, 664, 6, 10))
+l.objects.push(worldObject(107, 9, 312, 568, 7, 10))
+l.objects.push(worldObject(108, 9, 72, 664, 8, 10))
+l.objects.push(worldObject(109, 9, 72, 568, 9, 10))
 l.objects.push(worldObject(201, 10, 696, 88, 1, 0))
 l.objects.push(worldObject(202, 10, 792, 88, 2, 0))
 l.objects.push(worldObject(203, 10, 648, 152, 3, 0))
@@ -27845,6 +27882,7 @@ l.objects.push(worldObject(215, 10, 616, 424, 15, 0))
 l.objects.push(worldObject(216, 10, 488, 440, 16, 0))
 l.objects.push(worldObject(217, 10, 488, 504, 17, 0))
 l.objects.push(worldObject(218, 10, 392, 552, 18, 0))
+l.objects.push(worldObject(400, 12, 360, 616, 9, 0))
 l.defenderSlots = []
 l.defenderSlots.push(slot(1, 343, [
 46, 106, 166, 226, 286, 346, 406, 456, 457, 458, 459, 460, 461, 462, 463, 464, 465, 466, 516, 526, 586, 646, 706, 766
@@ -28714,7 +28752,7 @@ l.masks.push(mask(18, 4, 6, [
 return l
 }
 
-// LAYOUT area=11 name=Packing Barn size=62x46 objects=28 crops=5 D=18 routes=2 masks=241
+// LAYOUT area=11 name=Packing Barn size=62x46 objects=27 crops=5 D=18 routes=2 masks=241
 function area11(): farmTypes.Layout {
 let l = new farmTypes.Layout()
 l.area = 11; l.width = 62; l.height = 46; l.entry = point(936, 648)
@@ -28912,13 +28950,11 @@ l.objects = []
 l.objects.push(worldObject(1, 1, 984, 648, 0, 11))
 l.objects.push(worldObject(2, 8, 856, 200, 11, 0))
 l.objects.push(worldObject(11, 7, 312, 136, 12, 1))
-l.objects.push(worldObject(12, 7, 440, 136, 12, 2))
-l.objects.push(worldObject(13, 7, 568, 136, 12, 3))
-l.objects.push(worldObject(101, 9, 808, 136, 1, 11))
-l.objects.push(worldObject(102, 9, 872, 136, 2, 11))
-l.objects.push(worldObject(103, 9, 936, 136, 3, 11))
-l.objects.push(worldObject(104, 9, 776, 88, 4, 11))
-l.objects.push(worldObject(105, 9, 904, 88, 5, 11))
+l.objects.push(worldObject(101, 9, 760, 136, 1, 11))
+l.objects.push(worldObject(102, 9, 856, 88, 2, 11))
+l.objects.push(worldObject(103, 9, 936, 184, 3, 11))
+l.objects.push(worldObject(104, 9, 728, 88, 4, 11))
+l.objects.push(worldObject(105, 9, 904, 232, 5, 11))
 l.objects.push(worldObject(201, 10, 72, 360, 1, 0))
 l.objects.push(worldObject(202, 10, 72, 424, 2, 0))
 l.objects.push(worldObject(203, 10, 168, 360, 3, 0))
@@ -28937,6 +28973,7 @@ l.objects.push(worldObject(215, 10, 488, 296, 15, 0))
 l.objects.push(worldObject(216, 10, 552, 312, 16, 0))
 l.objects.push(worldObject(217, 10, 600, 232, 17, 0))
 l.objects.push(worldObject(218, 10, 712, 232, 18, 0))
+l.objects.push(worldObject(400, 12, 808, 200, 10, 0))
 l.defenderSlots = []
 l.defenderSlots.push(slot(1, 1368, [
 1488, 1489, 1490, 1491, 1492, 1493, 1494, 1495, 1496, 1497, 1498, 1560, 1622, 1684
@@ -29745,7 +29782,7 @@ l.masks.push(mask(18, 4, 6, [
 return l
 }
 
-// LAYOUT area=12 name=Moon Grove size=64x48 objects=33 crops=5 D=22 routes=3 masks=392
+// LAYOUT area=12 name=Moon Grove size=64x48 objects=32 crops=5 D=22 routes=3 masks=392
 function area12(): farmTypes.Layout {
 let l = new farmTypes.Layout()
 l.area = 12; l.width = 64; l.height = 48; l.entry = point(136, 712)
@@ -29956,13 +29993,11 @@ l.objects.push(worldObject(1, 1, 136, 760, 0, 12))
 l.objects.push(worldObject(2, 8, 936, 696, 12, 0))
 l.objects.push(worldObject(3, 12, 872, 648, 12, 1))
 l.objects.push(worldObject(11, 7, 328, 248, 13, 1))
-l.objects.push(worldObject(12, 7, 520, 248, 13, 2))
-l.objects.push(worldObject(13, 7, 712, 248, 13, 3))
-l.objects.push(worldObject(101, 9, 328, 120, 1, 12))
-l.objects.push(worldObject(102, 9, 520, 120, 2, 12))
-l.objects.push(worldObject(103, 9, 712, 120, 3, 12))
-l.objects.push(worldObject(104, 9, 424, 72, 4, 12))
-l.objects.push(worldObject(105, 9, 616, 72, 5, 12))
+l.objects.push(worldObject(101, 9, 280, 104, 1, 12))
+l.objects.push(worldObject(102, 9, 472, 104, 2, 12))
+l.objects.push(worldObject(103, 9, 664, 104, 3, 12))
+l.objects.push(worldObject(104, 9, 376, 104, 4, 12))
+l.objects.push(worldObject(105, 9, 568, 104, 5, 12))
 l.objects.push(worldObject(201, 10, 72, 424, 1, 0))
 l.objects.push(worldObject(202, 10, 120, 488, 2, 0))
 l.objects.push(worldObject(203, 10, 200, 536, 3, 0))
@@ -29985,6 +30020,7 @@ l.objects.push(worldObject(219, 10, 376, 600, 19, 0))
 l.objects.push(worldObject(220, 10, 408, 568, 20, 0))
 l.objects.push(worldObject(221, 10, 456, 536, 21, 0))
 l.objects.push(worldObject(222, 10, 536, 504, 22, 0))
+l.objects.push(worldObject(400, 12, 936, 648, 11, 0))
 l.defenderSlots = []
 l.defenderSlots.push(slot(1, 1668, [
 1728, 1729, 1730, 1731, 1732, 1733, 1734, 1735, 1736, 1800, 1864, 1928, 1992, 2056
@@ -41319,7 +41355,7 @@ return false
 
 let requiredCrop = requiredDefenderCrop(area)
 if (!powerEarned(progress, requiredCrop)) {
-farmWorld.notice("Program " + cropDisplayName(requiredCrop) + " before Ready.")
+farmWorld.notice("A at the " + cropDisplayName(requiredCrop) + " practice pad before Ready.")
 return false
 }
 if (placementCropCount(progress, area, requiredCrop) < 1) {
@@ -41988,6 +42024,7 @@ menuActionRows.push(i)
 }
 menuSurface = createMenuSurface(menuTitle, items)
 menuOpen = true
+farmWorldView.nextAction(currentLayout, WORLD_OBJECT_KIND, -1)
 setPlayerMovement(false)
 return true
 }
@@ -42056,6 +42093,7 @@ if (!resetPendingRestart) setPlayerMovement(true)
 // second selector without fighting the old menu's controller ownership.
 if (numberCallback) numberCallback(choice)
 else if (callback) callback(choice)
+if (!menuOpen) updateNextInstruction()
 }
 
 function moveMenu(delta: number): void {
@@ -42087,6 +42125,7 @@ items.push(miniMenu.createMenuItem("SELL"))
 menuActionRows.push(0)
 menuSurface = createMenuSurface(menuTitle, items)
 menuOpen = true
+farmWorldView.nextAction(currentLayout, WORLD_OBJECT_KIND, -1)
 setPlayerMovement(false)
 return true
 }
