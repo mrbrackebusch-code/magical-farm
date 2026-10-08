@@ -42087,7 +42087,11 @@ if (!interactiveObject(object)) continue
 let dx = object.x - currentPlayer.x
 let dy = object.y - currentPlayer.y
 let distance2 = dx * dx + dy * dy
-if (distance2 > INTERACTION_RANGE2 || distance2 >= bestDistance2) continue
+if (distance2 > INTERACTION_RANGE2 || distance2 > bestDistance2) continue
+// Several authored jobs and harvests share one soil tile. A ripe
+// crop wins that exact tie; its work station remains usable otherwise.
+if (distance2 == bestDistance2 && !(object.kind == farmTypes.ObjectKind.Harvest
+&& farmTasks.harvestReady(object.arg) && best && best.kind != farmTypes.ObjectKind.Harvest)) continue
 // Overlap is always eligible. Otherwise the object center must be in
 // the player's current half-plane, not merely nearby behind them.
 if (distance2 > 4) {
@@ -42737,8 +42741,19 @@ if (area == 0) {
 let destination = 1
 while (destination < 12 && currentProgress.cleared[destination]) destination += 1
 if (!currentProgress.unlocked[destination]) {
-directNext("Sell harvest, then open the stone gate to A" + destination + ".",
+let stock = 0
+for (let crop = 1; crop <= 12; crop++) stock += currentProgress.inventory[crop]
+if (currentProgress.gold >= areaUnlockCost(destination)) {
+let gate = instructionTarget(farmTypes.ObjectKind.Barrier, destination)
+directNext("A at the stone gate to open A" + destination + ".",
+gate >= 0 ? gate : instructionTarget(farmTypes.ObjectKind.Travel, destination - 1))
+} else if (stock > 0) {
+directNext("A at SELL HARVEST; sell enough for the A" + destination + " gate.",
 instructionTarget(farmTypes.ObjectKind.SellBox))
+} else {
+directNext("Visit A" + (destination - 1) + "; harvest ripe plants, then sell them here.",
+instructionTarget(farmTypes.ObjectKind.Travel, destination - 1))
+}
 } else {
 directNext("A at soil bed " + destination + " to visit " + areaName(destination) + ".",
 instructionTarget(farmTypes.ObjectKind.Travel, destination))
@@ -42804,10 +42819,18 @@ directNext("Follow the path to A" + nextArea + " for the next farm job.", target
 directNext("A at the stone gate to open A" + nextArea + ".", instructionTarget(farmTypes.ObjectKind.Barrier, nextArea))
 } else {
 let stock = 0
-for (let i = 1; i <= 12; i++) stock += currentProgress.inventory[i]
-directNext(stock > 0 ? "Go home and sell harvest; then open the next gate."
-: "A at a ripe plant to harvest. Sell harvest at home.",
-stock > 0 ? instructionTarget(farmTypes.ObjectKind.Travel, 0) : ripeHarvestTarget())
+let saleValue = 0
+for (let i = 1; i <= 12; i++) {
+stock += currentProgress.inventory[i]
+saleValue += currentProgress.inventory[i] * cropSellValue(i)
+}
+let ripe = ripeHarvestTarget()
+let enough = currentProgress.gold + saleValue >= areaUnlockCost(nextArea)
+let goSell = stock > 0 && (enough || ripe < 0)
+directNext(goSell ? "Go home and SELL HARVEST; then open the next gate."
+: ripe >= 0 ? "A at blinking ripe plants; harvest enough for the next gate."
+: "Plants are regrowing. Wait for ripe crops, then harvest with A.",
+goSell ? instructionTarget(farmTypes.ObjectKind.Travel, 0) : ripe)
 }
 }
 
