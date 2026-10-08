@@ -19040,6 +19040,330 @@ f4cddddddddddddddddc444444444444444444444444444444444444444444444444444444444444
 ........f4444444444444444444444444444444444444444444444444444444c44cd4d4c4d4dc4c4444444444444444444444444444444444444444444444444444444f........
 ........ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff........
 `
+const art89 = img`
+bbbbbbbbbbccbcbb
+bbcbbbbbbbbbbbbb
+bbbbbbbbbbbcbbbb
+cbbbbbcbbbcfbbbb
+bccbbbcfccfffccf
+bbbbbbc1111bbb11
+bbbbbcb11111b111
+bbcbbbb1111bbb11
+bbbccbbbbbbbbbbb
+bbbbc11bbb11111b
+bbbbb111b1111111
+cbbbb1bbbb11111b
+cbbbbbbbbbbbbbbb
+bccbbb11111bbb11
+bcbbb1111111b111
+bbbbbb11111bbbb1
+`
+const art90 = img`
+bbbbbbbbbbccbcbb
+cccbbbbbbbbbbbbb
+cbbcccbbbbbcbbbb
+fbbcbbcbbbcfbbbb
+ffcfccffccfffccf
+11bbbb11111bbb11
+1111b1111111b111
+111bbb11111bbb11
+bbbbbbbbbbbbbbbb
+bb11111bbb11111b
+b1111111b1111111
+bb1111bbbb11111b
+bbbbbbbbbbbbbbbb
+111bbb11111bbb11
+1111b1111111b111
+111bbb11111bbbb1
+`
+const art91 = img`
+bbbbbbbbbbccbcbb
+cccbbbbbbbbbbbbb
+cbbcccbbbbbcbbbb
+fbbcbbcbbbcfbbbb
+ffcfccffccbbbbbb
+11bbbb111cbbbcbc
+1111b11111bbbbbb
+111bbb11111cbcbb
+bbbbbbbbbbbcbbbb
+bb11111bbb1bbbbb
+b1111111b11bbbbb
+bb1111bbbb11bbcb
+bbbbbbbbbbbbccbb
+111bbb11111bbbbb
+1111b1111111bbbb
+111bbb11111bbbbb
+`
+const art92 = img`
+bbbbbbbbbbbbbbbb
+bbcb111bbbb1111b
+bbbc1111b1111111
+cbbb111bbb11111b
+bccbbbbbbbbbbbbb
+bbbbbb11111bbb11
+bbbbb1111111b111
+bbbbbb11111bbb11
+bbbcbbbbbbbbbbbb
+bbbbc11bbb11111b
+bbbbc111b1111111
+cbbbc1bbbb11111b
+cbbbbbbbbbbbbbbb
+bcbbbb11111bbb11
+bcbbb1111111b111
+bbbbbb11111bbbb1
+`
+const art93 = img`
+bbbbbbbbbbbbbbbb
+bb11111bbbb1111b
+b1111111b1111111
+bb11111bbb11111b
+bbbbbbbbbbbbbbbb
+11bbbb11111bbb11
+1111b1111111b111
+111bbb11111bbb11
+bbbbbbbbbbbbbbbb
+bb11111bbb11111b
+b1111111b1111111
+bb1111bbbb11111b
+bbbbbbbbbbbbbbbb
+111bbb11111bbb11
+1111b1111111b111
+111bbb11111bbbb1
+`
+const art94 = img`
+bbbbbbbbbbbbbcbb
+bb11111bbbb1bbbb
+b1111111b111bbbb
+bb11111bbb11bbbb
+bbbbbbbbbbbbbbbb
+11bbbb11111bbcbc
+1111b1111111bbbb
+111bbb11111bbcbb
+bbbbbbbbbbbbbbbb
+bb11111bbb1bbbbb
+b1111111b11bbbbb
+bb1111bbbb1bbbcb
+bbbbbbbbbbbbccbb
+111bbb11111bbbbb
+1111b1111111bbbb
+111bbb11111bbbbb
+`
+const art95 = img`
+bbbbbbbbbbbbbbbb
+bbcb111bbbb1111b
+bbbc1111b1111111
+cbbb111bbb11111b
+bccbbbbbbbbbbbbb
+bbbbbb11111bbb11
+bbbbb1111111b111
+bbbbbb11111bbb11
+bbbcbbbbbbbbbbbb
+bbbbc11bbb11111b
+bbbbbc11b1111111
+cbbbbcbbbb11111b
+cbbbbcbccbbcccbb
+bcbbcbbbbcbbbbbb
+bcbbcbbbbbbbbbbb
+bbbbbbcccbbbbbbb
+`
+const art96 = img`
+bbbbbbbbbbbbbbbb
+bb11111bbbb1111b
+b1111111b1111111
+bb11111bbb11111b
+bbbbbbbbbbbbbbbb
+11bbbb11111bbb11
+1111b1111111b111
+111bbb11111bbb11
+bbbbbbbbbbbbbbbb
+bb11111bbb11111b
+b1111111b1111111
+bb1111bbbb11111b
+cbbbbcbbbbbcccbb
+bcbbcbbbbbbbbbbb
+bcbbcbbbbbbbbbbb
+bbbbbbcccbbbbbbb
+`
+const art97 = img`
+bbbbbbbbbbbbbcbb
+bb11111bbbb1bbbb
+b1111111b111bbbb
+bb11111bbb11bbbb
+bbbbbbbbbbbbbbbb
+11bbbb11111bbcbc
+1111b1111111bbbb
+111bbb11111bccbb
+bbbbbbbbbbbcbbbb
+bb11111bbbcbbbbb
+b1111111bbcbbbbb
+bb1111bbbbbbbbcb
+cbbbbcbbbbbcccbb
+bcbbcbbbbbbbbbbb
+bcbbcbbbbbbbbbbb
+bbbbbbcccbbbbbbb
+`
+const art98 = img`
+77776aa677777777
+77777667777aa7aa
+777777777777aaa7
+77777a7777766a66
+77777aa77affffff
+7aa777a7fffbbccc
+aa7777afbbbfcfbb
+a66777fbbbbbfbbb
+77a7acbbbfcccfbb
+776a6cccffbbbcfb
+7777cbbbbfbbbbcf
+7777cbbbbbfbbbfc
+7777cbbbbbfccccf
+7a7accbbbfcbbbbb
+76a6cbccccbbbbbb
+7777cbbcfbbbbbbb
+`
+const art99 = img`
+77776aa677777777
+77777667777aa7aa
+777777777777aaa7
+77777a7777766a66
+ffffffffffffffff
+cccbbfcbbbbffccc
+bbbcfbbbbbbbcfbb
+bbbbcbbbbbbbfbbb
+bbbbcfbbbfcccfbb
+bbbfccccffbbbcfb
+ccccbbbbbfbbbbcf
+bbbffbbbbbfbbbfc
+bbbbcbbbbbfccccf
+fcccccbbbfcbbbbb
+bfcbbbccccbbbbbb
+fcbbbbbcfbbbbbbb
+`
+const art100 = img`
+77776aa677777777
+77777667777aa7aa
+777777777777aaa7
+77777a7777766a66
+ffffffa77a777777
+cccfbbffa77777aa
+bbbcffbbf677777a
+bbbbcbbbbf77a7a6
+bbbbcfbbbfc76a67
+bbbfccccffc77777
+ccccbbbbbfbc7777
+bbbffbbbbbfc77a7
+bbbbcbbbbbfc7a77
+fcccccbbbfcc6a77
+bfcbbbccccbc6777
+fcbbbbbcfbbc7777
+`
+const art101 = img`
+7777cbbcbbbbbbbf
+7777cbbffbbbbfcc
+7777ccfbbfccfbbb
+7777cbcbbcbbbbbb
+7777cbfccffbbbbb
+7aa7cfcbbbbffccc
+aa77cbbbbbbbcfbb
+a667cbbbbbbbfbbb
+77a7cfbbbfcccfbb
+776accccffbbbcfb
+7777cbbbbfbbbbcf
+7777fbbbbbfbbbfc
+7777cbbbbbfccccf
+7a7accbbbfcbbbbb
+76a6cbccccbbbbbb
+7777cbbcfbbbbbbb
+`
+const art102 = img`
+cbbbbbbcbbbbbbbf
+cbbbbbbffbbbbfcc
+fcccccffccccfbbb
+bfcfffccccbbbbbb
+bbfffffccffbbbbb
+cccfffcbbbbffccc
+bbbcfbbbbbbbcfbb
+bbbbcbbbbbbbfbbb
+bbbbcfbbbfccccbb
+bbbfccccffbffffb
+ccccbbbbbffbffcf
+fbfffbbbbbcffffc
+ffffcbbbbbfccccf
+fcccccbbbfcbbbbb
+bfcbbbccccbbbbbb
+fcbbbbbcfbbbbbbb
+`
+const art103 = img`
+cbbbbbbcbbbc7777
+cbbbbbbffbbca7aa
+fcccccfbbfccaaa7
+bfcbbbcbbcbc6a66
+bbfbbbfccffc7777
+cccfbfcbbbbc77aa
+bbbcfbbbbbbc777a
+bbbbcbbbbbbca7a6
+bbbbcfbbbfcc6a67
+bbbfccccffbc7777
+ccccbbbbbfbc7777
+bbbffbbbbbfc77a7
+bbbbcbbbbbfc7a77
+fcccccbbbfcc6a77
+bfcbbbccccbc6777
+fcbbbbbcfbbc7777
+`
+const art104 = img`
+7777cbbcbbbbbbbf
+7777cbbffbbbbfcc
+7777ccfbbfccfbbb
+7777cbcbbcbbbbbb
+7777cbfccffbbbbb
+7aa7cfcbbbbffccc
+aa77cfbbbbbbcfbb
+a6677cbbbbbbfbbb
+77a7acfbbccccfbb
+776a67cfcbbbbcfb
+7777777cffbbbbcf
+77777a7accfffffc
+77777a6a67cccccc
+7a7a7777676a6a77
+76a6777777776777
+7777aa7a77777777
+`
+const art105 = img`
+cbbbbbbcbbbbbbbf
+cbbbbbbffbbbbfcc
+fcccccfbbfccfbbb
+bfcbbbcbbcbbbbbb
+bbfbbbfccffbbbbb
+cccfbfcbbbbffccc
+bbbcfbbbbbbbcfbb
+bbbbcbbbbbbbfbbb
+bbbbcfbbbfcccfbb
+bbbfccccffbbbcfb
+ccccbbbbbfbbbbcf
+ffffcffffcfffffc
+cccccccccccccccc
+7a7a7777676a6a77
+76a6777777776777
+7777aa7a77777777
+`
+const art106 = img`
+cbbbbbbcbbbc7777
+cbbbbbbffbbca7aa
+fcccccfbbfccaaa7
+bfcbbbcbbcbc6a66
+bbfbbbfccffc7777
+cccfbfcbbbfc77aa
+bbbcfbbbbbfc777a
+bbbbcbbbbbc7a7a6
+bbbbcfbbbfc76a67
+bbbfccccfc777777
+ccccfbbfc7777777
+ffffcfcc77a777a7
+cccccc6a677a7a77
+7a7a7777676a6a77
+76a6777777776777
+7777aa7a77777777
+`
 export function tile(family: string, variant: number): Image {
 if (variant < 0 || variant > 8 || variant != Math.floor(variant)) return art4
 if (family == "grass") {
@@ -19141,6 +19465,28 @@ if (variant == 6) return art78
 if (variant == 7) return art79
 if (variant == 8) return art80
 }
+if (family == "stone.path") {
+if (variant == 0) return art89
+if (variant == 1) return art90
+if (variant == 2) return art91
+if (variant == 3) return art92
+if (variant == 4) return art93
+if (variant == 5) return art94
+if (variant == 6) return art95
+if (variant == 7) return art96
+if (variant == 8) return art97
+}
+if (family == "enemy.path") {
+if (variant == 0) return art98
+if (variant == 1) return art99
+if (variant == 2) return art100
+if (variant == 3) return art101
+if (variant == 4) return art102
+if (variant == 5) return art103
+if (variant == 6) return art104
+if (variant == 7) return art105
+if (variant == 8) return art106
+}
 return art4
 }
 export function object(key: string): Image {
@@ -19164,6 +19510,23 @@ let terrainKeys: string[] = []
 let terrainImages: Image[] = []
 let walkingLayout: farmTypes.Layout = null
 let walkingCells: number[] = []
+let routeLayout: farmTypes.Layout = null
+let routeCells: number[] = []
+
+export function enemyPathCells(layout: farmTypes.Layout): number[] {
+let result: number[] = []
+for (let i = 0; i < layout.routes.length; i++) for (let j = 0; j < layout.routes[i].tiles.length; j++) {
+let tile = layout.routes[i].tiles[j]
+if (tile < 0 || tile >= layout.ground.length || layout.walls[tile]) continue
+let ground = layout.ground[tile]
+if (ground == 9 || ground == 12 || (ground >= 4 && ground <= 7)) continue
+if (layout.cropTiles.indexOf(tile) >= 0 || layout.taskTiles.indexOf(tile) >= 0) continue
+let soil = false
+for (let k = 0; k < layout.defenderSlots.length; k++) if (layout.defenderSlots[k].tile == tile) soil = true
+if (!soil && result.indexOf(tile) < 0) result.push(tile)
+}
+return result
+}
 
 export function installPalette(): void {
 image.setPalette(hex`000000ffffff ff4055c957ff c98b67ffe64a 50c14064d14c 799aff7ab5ff 88de5f94a2a3 4c3f38ebb97c 21e9ff000000`)
@@ -19173,6 +19536,8 @@ function material(layout: farmTypes.Layout, x: number, y: number): string {
 if (x < 0 || y < 0 || x >= layout.width || y >= layout.height) return ""
 let cell = y * layout.width + x
 let ground = layout.ground[cell]
+if (routeLayout != layout) { routeLayout = layout; routeCells = enemyPathCells(layout) }
+if (routeCells.indexOf(cell) >= 0) return "enemy.path"
 if (ground == 12) return "fence"
 if (ground == 2) {
 if (walkingLayout != layout) { walkingLayout = layout; walkingCells = farmLayout.walkingTiles(layout) }
@@ -19201,17 +19566,8 @@ for (let i = 0; i < terrainKeys.length; i++) if (terrainKeys[i] == key) return t
 let result: Image = null
 let floorBackground = variant >= 20
 if (floorBackground) variant -= 20
-if (family == "stone.path") {
-// Exact selected rock2 pixels form grey stone pavers over the
-// source path centre. Keep natural brown shadows and grey highlights.
-result = farmWorldArt.tile("path", 4).clone()
-for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
-let c = result.getPixel(x, y)
-if (c == 13) c = 11
-else if (c == 4) c = 12
-result.setPixel(x, y, c)
-}
-result.drawTransparentImage(farmWorldArt.object("rock2"), 0, 0)
+if (family == "stone.path" || family == "enemy.path") {
+result = farmWorldArt.tile(family, variant)
 } else if ((family == "soil" || family.substr(0, 5) == "soil.") && variant == 9) {
 // A single logical plot needs the whole rounded source bed, rather
 // than the rectangular atlas centre. Sample its32px inner patch at
@@ -19271,7 +19627,7 @@ return soilFamily(family) ? soilFamily(neighbor) : neighbor == family
 }
 
 function variant(layout: farmTypes.Layout, family: string, x: number, y: number): number {
-if (family == "grass" || family == "floor" || family == "cliff" || family == "stone.path" || family == "room.wall" || (family == "soil" && layout.area == 0)) return 4
+if (family == "grass" || family == "floor" || family == "cliff" || family == "room.wall" || (family == "soil" && layout.area == 0)) return 4
 let north = sameBed(layout, family, x, y - 1)
 let south = sameBed(layout, family, x, y + 1)
 let west = sameBed(layout, family, x - 1, y)
@@ -19377,6 +19733,8 @@ return true
 let padImages: Image[] = []
 let guidance: Sprite = null
 let guidanceImage: Image = null
+let guidanceReadyImage: Image = null
+let guidanceReady = false
 let guidanceLayout: farmTypes.Layout = null
 let guidanceId = -1
 let guidanceElapsed = 0
@@ -19443,6 +19801,7 @@ if (guidanceLayout == layout && guidanceId == targetObjectId) return
 guidanceLayout = layout
 guidanceId = targetObjectId
 guidanceActive = false
+guidanceReady = false
 guidanceElapsed = 0
 let target: farmTypes.WorldObject = null
 if (layout && targetObjectId > 0) for (let i = 0; i < layout.objects.length; i++) {
@@ -19462,20 +19821,45 @@ guidanceImage.fillRect(10 - width / 2, y, width, 1, 15)
 if (width > 4) guidanceImage.fillRect(12 - width / 2, y, width - 4, 1, 5)
 }
 }
+if (!guidanceReadyImage) {
+guidanceReadyImage = image.create(20, 24)
+guidanceReadyImage.drawTransparentImage(guidanceImage, 0, 0)
+for (let y = 0; y < 14; y++) for (let x = 0; x < 20; x++) {
+if (guidanceReadyImage.getPixel(x, y) == 5) guidanceReadyImage.setPixel(x, y, 14)
+}
+guidanceReadyImage.fillRect(4, 13, 12, 11, 15)
+guidanceReadyImage.fillRect(5, 14, 10, 9, 14)
+guidanceReadyImage.print("A", 7, 14, 15, image.font8)
+}
 if (!guidance) {
 guidance = sprites.create(guidanceImage, kind)
 guidance.setFlag(SpriteFlag.Ghost, true)
 guidance.z = 9000
 }
+guidance.setImage(guidanceImage)
 guidance.setPosition(target.x, target.y - 26)
 guidance.setFlag(SpriteFlag.Invisible, false)
 guidanceActive = true
+}
+
+// Root supplies the actual nearest-facing interaction eligibility. Color
+// never substitutes for its range/facing/handler guards.
+export function nextActionReady(ready: boolean): void {
+if (!guidance || !guidanceActive || guidanceReady == ready) return
+guidanceReady = ready
+guidanceElapsed = 0
+guidance.setImage(ready ? guidanceReadyImage : guidanceImage)
+guidance.setFlag(SpriteFlag.Invisible, false)
 }
 
 // Parent invokes this from its one existing update path. dt only; no new
 // timers, controller callbacks, images or sprites are allocated here.
 export function pulse(dtMs: number): void {
 if (!guidance || !guidanceActive) return
+if (guidanceReady) {
+guidance.setFlag(SpriteFlag.Invisible, false)
+return
+}
 guidanceElapsed = (guidanceElapsed + dtMs) % 800
 guidance.setFlag(SpriteFlag.Invisible, guidanceElapsed >= 560)
 }
@@ -30340,8 +30724,40 @@ cell = previous[cell]
 }
 }
 
+// The Hub is a junction: each physical branch leaves on the opposite edge
+// of the destination's authored return gate. Farm geometry is never rotated,
+// so crop order, route sequences and directional masks retain their meaning.
+function arrangeHubConnections(layout: farmTypes.Layout): void {
+if (layout.area != 0) return
+for (let i = 0; i < layout.objects.length; i++) {
+let o = layout.objects[i]
+if (o.kind != farmTypes.ObjectKind.Exit && o.kind != farmTypes.ObjectKind.Barrier) continue
+let area = o.arg
+let edge = 0
+let along = 0
+if (area == 2) { edge = 1; along = 10 }
+if (area == 10) { edge = 1; along = 22 }
+if (area == 11) { edge = 1; along = 34 }
+if (area == 3) { edge = 2; along = 7 }
+if (area == 4) { edge = 2; along = 14 }
+if (area == 5) { edge = 2; along = 21 }
+if (area == 8) { edge = 2; along = 28 }
+if (area == 9) { edge = 2; along = 35 }
+if (area == 12) { edge = 2; along = 42 }
+if (area == 1) { edge = 3; along = 10 }
+if (area == 6) { edge = 3; along = 22 }
+if (area == 7) { edge = 3; along = 34 }
+if (!edge) continue
+let inward = o.kind == farmTypes.ObjectKind.Barrier ? 3 : 0
+if (edge == 1) { o.x = inward * 16 + 8; o.y = along * 16 + 8 }
+if (edge == 2) { o.x = along * 16 + 8; o.y = inward * 16 + 8 }
+if (edge == 3) { o.x = (layout.width - 1 - inward) * 16 + 8; o.y = along * 16 + 8 }
+}
+}
+
 function landscape(layout: farmTypes.Layout): farmTypes.Layout {
 if (layout.area < 0 || layout.area > 12) return layout
+arrangeHubConnections(layout)
 let safe: number[] = []
 for (let i = 0; i < layout.ground.length; i++) safe.push(0)
 if (layout.area == 0) {
@@ -41447,6 +41863,18 @@ if (now >= nextUpdateMs) {
 nextUpdateMs = now + 200
 updateNextInstruction()
 }
+updateInteractionCue()
+}
+
+function updateInteractionCue(): void {
+// Use the exact selector that A dispatches, including range, facing,
+// unlocks and competing nearby objects. Visual sprite overlap alone
+// would falsely invite A before an interaction is actually selectable.
+let selected = nearestFacingInteraction()
+let ready = !!selected && selected.id == nextObjectId
+&& !resetPendingRestart && !transitionPending()
+&& (!saveBlocked || selected.kind == farmTypes.ObjectKind.Reset)
+farmWorldView.nextActionReady(ready)
 }
 
 function instructionTarget(kind: number, arg: number = 999): number {
@@ -41463,6 +41891,7 @@ if (nextInstruction != text) nextInstructionLines = wrapLine("Next: " + text, Ma
 nextInstruction = text
 nextObjectId = targetId
 farmWorldView.nextAction(currentLayout, WORLD_OBJECT_KIND, menuOpen ? -1 : targetId)
+updateInteractionCue()
 }
 
 const FARM_RECIPE = [0, 1, 2, 4, 5, 6, 8, 10, 11, 12, 13, 14, 15]
@@ -41651,6 +42080,8 @@ if (menuOpen) {
 closeMenu(quantityMenu ? quantityValue : selectedMenuChoice())
 return
 }
+updateFacing()
+updateInteractionCue()
 dispatchInteraction(nearestFacingInteraction())
 }
 
