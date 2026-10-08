@@ -19364,6 +19364,456 @@ cccccc6a677a7a77
 76a6777777776777
 7777aa7a77777777
 `
+const art107 = img`
+77776cccccf77777
+7777c4dddd4fa7aa
+7777c444444faaa7
+7777cccccccf6a66
+7777c444444c7777
+7aa7c4ccc4cc77aa
+aa77c4cd4c4c777a
+a667c4cd4c4ca7a6
+77a7c4cd4ccc6a67
+776ac4c44ccc7777
+7777c4c44ccc7777
+7777f4c4dc4c77a7
+77777fc4dcca7a77
+7a7a77c44c6a6a77
+76a677cd4c776777
+7777aacd4c777777
+`
+const art108 = img`
+77776ccd4cc77777
+7777c4c44ccfa7aa
+7777c4cd44cfaaa7
+7777cccd4ccf6a66
+7777c4c44ccc7777
+7aa7c4cd4ccc77aa
+aa77c4cd44cc777a
+a667c4cd44cca7a6
+77a7c4cd4ccc6a67
+776ac4c44ccc7777
+7777c4c44ccc7777
+7777f4c4dc4c77a7
+77777fc4dcca7a77
+7a7a77c44c6a6a77
+76a677cd4c776777
+7777aacd4c777777
+`
+const art109 = img`
+77776cccccf77777
+7777c4dddd4fa7aa
+7777c444444faaa7
+7777cccccccf6a66
+7777c444cccccccc
+7aa7c4ccddd4dd4d
+aa77c4cd44444444
+a667c4cd44ccc4cc
+77a7c4cdcccccccc
+776ac4c44ccc7777
+7777c4c44ccc7777
+7777f4c4dc4c77a7
+77777fc4dcca7a77
+7a7a77c44c6a6a77
+76a677cd4c776777
+7777aacd4c777777
+`
+const art110 = img`
+77776ccd4cc77777
+7777c4c44ccfa7aa
+7777c4cd44cfaaa7
+7777cccd4ccf6a66
+7777c4c44ccccccc
+7aa7c4cd4cc4dd4d
+aa77c4cd44c44444
+a667c4cd44ccc4cc
+77a7c4cdcccccccc
+776ac4c44ccc7777
+7777c4c44ccc7777
+7777f4c4dc4c77a7
+77777fc4dcca7a77
+7a7a77c44c6a6a77
+76a677cd4c776777
+7777aacd4c777777
+`
+const art111 = img`
+77776cccccf77777
+7777c4dddd4fa7aa
+7777c444444faaa7
+7777cccccccf6a66
+7777c444444c7777
+7aa7c4ccc4cc77aa
+aa77c4cd4c4c777a
+a667c4cd4c4ca7a6
+77a7c4cd4ccc6a67
+776ac4c44ccc7777
+7777c4cd44cc7777
+7777f4cd4ccc77a7
+77777fc44cca7a77
+7a7a77cd4cca6a77
+76a677cd44c76777
+7777aacd44c77777
+`
+const art112 = img`
+77776ccd4cc77777
+7777c4c44ccfa7aa
+7777c4cd44cfaaa7
+7777cccd4ccf6a66
+7777c4c44ccc7777
+7aa7c4cd4ccc77aa
+aa77c4cd44cc777a
+a667c4cd44cca7a6
+77a7c4cd4ccc6a67
+776ac4c44ccc7777
+7777c4cd44cc7777
+7777f4cd4ccc77a7
+77777fc44cca7a77
+7a7a77cd4cca6a77
+76a677cd44c76777
+7777aacd44c77777
+`
+const art113 = img`
+77776cccccf77777
+7777c4dddd4fa7aa
+7777c444444faaa7
+7777cccccccf6a66
+7777c444cccccccc
+7aa7c4ccddd4dd4d
+aa77c4cd44444444
+a667c4cd44ccc4cc
+77a7c4cd4ccccccc
+776ac4c44ccc7777
+7777c4cd44cc7777
+7777f4cd4ccc77a7
+77777fc44cca7a77
+7a7a77cd4cca6a77
+76a677cd44c76777
+7777aacd44c77777
+`
+const art114 = img`
+77776ccd4cc77777
+7777c4c44ccfa7aa
+7777c4cd44cfaaa7
+7777cccd4ccf6a66
+7777c4c44ccccccc
+7aa7c4cd4cc4dd4d
+aa77c4cd44c44444
+a667c4cd44ccc4cc
+77a7c4cd4ccccccc
+776ac4c44ccc7777
+7777c4cd44cc7777
+7777f4cd4ccc77a7
+77777fc44cca7a77
+7a7a77cd4cca6a77
+76a677cd44c76777
+7777aacd44c77777
+`
+const art115 = img`
+77776cccccf77777
+7777c4dddd4fa7aa
+7777c444444faaa7
+7777cccccccf6a66
+cccccccc444c7777
+ddd4dd4dc4cc77aa
+444444444c4c777a
+44ccc4cc4c4ca7a6
+cccccccc4ccc6a67
+776ac4c44ccc7777
+7777c4c44ccc7777
+7777f4c4dc4c77a7
+77777fc4dcca7a77
+7a7a77c44c6a6a77
+76a677cd4c776777
+7777aacd4c777777
+`
+const art116 = img`
+77776ccd4cc77777
+7777c4c44ccfa7aa
+7777c4cd44cfaaa7
+7777cccd4ccf6a66
+ccccccc44ccc7777
+ddd4ddcd4ccc77aa
+444444cd44cc777a
+44ccc4cd44cca7a6
+cccccccc4ccc6a67
+776ac4c44ccc7777
+7777c4c44ccc7777
+7777f4c4dc4c77a7
+77777fc4dcca7a77
+7a7a77c44c6a6a77
+76a677cd4c776777
+7777aacd4c777777
+`
+const art117 = img`
+77776cccccf77777
+7777c4dddd4fa7aa
+7777c444444faaa7
+7777cccccccf6a66
+cccccccccccccccc
+ddd4dd4dddd4dd4d
+4444444444444444
+44ccc4cc44ccc4cc
+cccccccccccccccc
+776ac4c44ccc7777
+7777c4c44ccc7777
+7777f4c4dc4c77a7
+77777fc4dcca7a77
+7a7a77c44c6a6a77
+76a677cd4c776777
+7777aacd4c777777
+`
+const art118 = img`
+77776ccd4cc77777
+7777c4c44ccfa7aa
+7777c4cd44cfaaa7
+7777cccd4ccf6a66
+ccccccc44ccccccc
+ddd4ddcd4cc4dd4d
+444444cd44c44444
+44ccc4cd44ccc4cc
+cccccccccccccccc
+776ac4c44ccc7777
+7777c4c44ccc7777
+7777f4c4dc4c77a7
+77777fc4dcca7a77
+7a7a77c44c6a6a77
+76a677cd4c776777
+7777aacd4c777777
+`
+const art119 = img`
+77776cccccf77777
+7777c4dddd4fa7aa
+7777c444444faaa7
+7777cccccccf6a66
+cccccccc444c7777
+ddd4dd4dc4cc77aa
+444444444c4c777a
+44ccc4cc4c4ca7a6
+cccccccd4ccc6a67
+776ac4c44ccc7777
+7777c4cd44cc7777
+7777f4cd4ccc77a7
+77777fc44cca7a77
+7a7a77cd4cca6a77
+76a677cd44c76777
+7777aacd44c77777
+`
+const art120 = img`
+77776ccd4cc77777
+7777c4c44ccfa7aa
+7777c4cd44cfaaa7
+7777cccd4ccf6a66
+ccccccc44ccc7777
+ddd4ddcd4ccc77aa
+444444cd44cc777a
+44ccc4cd44cca7a6
+cccccccd4ccc6a67
+776ac4c44ccc7777
+7777c4cd44cc7777
+7777f4cd4ccc77a7
+77777fc44cca7a77
+7a7a77cd4cca6a77
+76a677cd44c76777
+7777aacd44c77777
+`
+const art121 = img`
+77776cccccf77777
+7777c4dddd4fa7aa
+7777c444444faaa7
+7777cccccccf6a66
+cccccccccccccccc
+ddd4dd4dddd4dd4d
+4444444444444444
+44ccc4cc44ccc4cc
+cccccccd4ccccccc
+776ac4c44ccc7777
+7777c4cd44cc7777
+7777f4cd4ccc77a7
+77777fc44cca7a77
+7a7a77cd4cca6a77
+76a677cd44c76777
+7777aacd44c77777
+`
+const art122 = img`
+77776ccd4cc77777
+7777c4c44ccfa7aa
+7777c4cd44cfaaa7
+7777cccd4ccf6a66
+ccccccc44ccccccc
+ddd4ddcd4cc4dd4d
+444444cd44c44444
+44ccc4cd44ccc4cc
+cccccccd4ccccccc
+776ac4c44ccc7777
+7777c4cd44cc7777
+7777f4cd4ccc77a7
+77777fc44cca7a77
+7a7a77cd4cca6a77
+76a677cd44c76777
+7777aacd44c77777
+`
+const art123 = img`
+cccccccccccccccc
+bbbbcbbbbbbbcbbb
+bbbbcbbbbbbbcbbb
+bbbbcbbbbbbbcbbb
+cccccccccccccccc
+cbbbbbbbcbbbbbbb
+cbbbbbbbcbbbbbbb
+cbbbbbbbcbbbbbbf
+ccccccccccccccfb
+bbbbcbbbbbbbcfbb
+bbbbcbbbbbbbfbbb
+bbbbcbbbbbbbfbbb
+ccccccccccccfbbc
+cbbbbbbbcbbbfccf
+cbbbbbbbcbbbbfff
+cbbbbbbbcbbbbcbf
+`
+const art124 = img`
+cccccccccccccccc
+bbbbcbbbbbbbcbbb
+bbbbcbbbbbbbcbbb
+bbbbcbbbbbbbcbbb
+cccccccccccccccc
+cbbbbbbbcbbbbbbb
+cbbbbbbbcbbbbbbb
+cbbbbbbbcbbbbbbf
+ccccccccccccccfb
+bbbbcbbbbbbbcfbb
+bbbbcbbbbbbbfbbb
+bbbbcbbbbbbbfbbb
+ccccccccccccfbbc
+cbbbbbbbcbbbfccf
+cbbbbbbbcbbbbfff
+cbbbbbbbcbbbbcbf
+`
+const art125 = img`
+cccccccccccccccc
+bbbbcbbbbbbbcbbb
+bbbbcbbbbbbbcbbb
+bbbbcbbbbbbbcbbb
+cccccccccccccccc
+cbbbbbbbcbbbbbbb
+cbbbbbbbcbbbbbbb
+cbbbbbbbcbbbbbbf
+ccccccccccccccfb
+bbbbcbbbbbbbcfbb
+bbbbcbbbbbbbfbbb
+bbbbcbbbbbbbfbbb
+ccccccccccccfbbc
+cbbbbbbbcbbbfccf
+cbbbbbbbcbbbbfff
+cbbbbbbbcbbbbcbf
+`
+const art126 = img`
+cccccccccccccccc
+bbbbcbbbbbbbcbbb
+bbbbcbbbbbbbcbbb
+bbbbcbbbbbbbcbbb
+cccccccccccccccc
+cbbbbbbbcbbbbbbb
+cbbbbbbbcbbbbbbb
+cbbbbbbbcbbbbbbf
+ccccccccccccccfb
+bbbbcbbbbbbbcfbb
+bbbbcbbbbbbbfbbb
+bbbbcbbbbbbbfbbb
+ccccccccccccfbbc
+cbbbbbbbcbbbfccf
+cbbbbbbbcbbbbfff
+cbbbbbbbcbbbbcbf
+`
+const art127 = img`
+cccccccccccccccc
+bbbbcbbbbbbbcbbb
+bbbbcbbbbbbbcbbb
+bbbbcbbbbbbbcbbb
+cccccccccccccccc
+cbbbbbbbcbbbbbbb
+cbbbbbbbcbbbbbbb
+cbbbbbbbcbbbbbbf
+ccccccccccccccfb
+bbbbcbbbbbbbcfbb
+bbbbcbbbbbbbfbbb
+bbbbcbbbbbbbfbbb
+ccccccccccccfbbc
+cbbbbbbbcbbbfccf
+cbbbbbbbcbbbbfff
+cbbbbbbbcbbbbcbf
+`
+const art128 = img`
+cccccccccccccccc
+bbbbcbbbbbbbcbbb
+bbbbcbbbbbbbcbbb
+bbbbcbbbbbbbcbbb
+cccccccccccccccc
+cbbbbbbbcbbbbbbb
+cbbbbbbbcbbbbbbb
+cbbbbbbbcbbbbbbf
+ccccccccccccccfb
+bbbbcbbbbbbbcfbb
+bbbbcbbbbbbbfbbb
+bbbbcbbbbbbbfbbb
+ccccccccccccfbbc
+cbbbbbbbcbbbfccf
+cbbbbbbbcbbbbfff
+cbbbbbbbcbbbbcbf
+`
+const art129 = img`
+cccccccccccccccc
+bbbbcbbbbbbbcbbb
+bbbbcbbbbbbbcbbb
+bbbbcbbbbbbbcbbb
+cccccccccccccccc
+cbbbbbbbcbbbbbbb
+cbbbbbbbcbbbbbbb
+cbbbbbbbcbbbbbbf
+ccccccccccccccfb
+bbbbcbbbbbbbcfbb
+bbbbcbbbbbbbfbbb
+bbbbcbbbbbbbfbbb
+ccccccccccccfbbc
+cbbbbbbbcbbbfccf
+cbbbbbbbcbbbbfff
+cbbbbbbbcbbbbcbf
+`
+const art130 = img`
+cccccccccccccccc
+bbbbcbbbbbbbcbbb
+bbbbcbbbbbbbcbbb
+bbbbcbbbbbbbcbbb
+cccccccccccccccc
+cbbbbbbbcbbbbbbb
+cbbbbbbbcbbbbbbb
+cbbbbbbbcbbbbbbf
+ccccccccccccccfb
+bbbbcbbbbbbbcfbb
+bbbbcbbbbbbbfbbb
+bbbbcbbbbbbbfbbb
+ccccccccccccfbbc
+cbbbbbbbcbbbfccf
+cbbbbbbbcbbbbfff
+cbbbbbbbcbbbbcbf
+`
+const art131 = img`
+cccccccccccccccc
+bbbbcbbbbbbbcbbb
+bbbbcbbbbbbbcbbb
+bbbbcbbbbbbbcbbb
+cccccccccccccccc
+cbbbbbbbcbbbbbbb
+cbbbbbbbcbbbbbbb
+cbbbbbbbcbbbbbbf
+ccccccccccccccfb
+bbbbcbbbbbbbcfbb
+bbbbcbbbbbbbfbbb
+bbbbcbbbbbbbfbbb
+ccccccccccccfbbc
+cbbbbbbbcbbbfccf
+cbbbbbbbcbbbbfff
+cbbbbbbbcbbbbcbf
+`
 export function tile(family: string, variant: number): Image {
 if (variant < 0 || variant > 8 || variant != Math.floor(variant)) return art4
 if (family == "grass") {
@@ -19432,6 +19882,17 @@ if (variant == 6) return art51
 if (variant == 7) return art52
 if (variant == 8) return art53
 }
+if (family == "wall") {
+if (variant == 0) return art123
+if (variant == 1) return art124
+if (variant == 2) return art125
+if (variant == 3) return art126
+if (variant == 4) return art127
+if (variant == 5) return art128
+if (variant == 6) return art129
+if (variant == 7) return art130
+if (variant == 8) return art131
+}
 if (family == "soil.dry") {
 if (variant == 0) return art54
 if (variant == 1) return art55
@@ -19498,6 +19959,22 @@ if (key == "window.mesh") return art85
 if (key == "window.glass") return art86
 if (key == "fence.horizontal") return art87
 if (key == "house") return art88
+if (key == "fence.0") return art107
+if (key == "fence.1") return art108
+if (key == "fence.2") return art109
+if (key == "fence.3") return art110
+if (key == "fence.4") return art111
+if (key == "fence.5") return art112
+if (key == "fence.6") return art113
+if (key == "fence.7") return art114
+if (key == "fence.8") return art115
+if (key == "fence.9") return art116
+if (key == "fence.10") return art117
+if (key == "fence.11") return art118
+if (key == "fence.12") return art119
+if (key == "fence.13") return art120
+if (key == "fence.14") return art121
+if (key == "fence.15") return art122
 return null
 }
 }
@@ -19509,21 +19986,29 @@ namespace farmWorldView {
 let terrainKeys: string[] = []
 let terrainImages: Image[] = []
 let walkingLayout: farmTypes.Layout = null
-let walkingCells: number[] = []
+let walkingMask: Buffer = null
 let routeLayout: farmTypes.Layout = null
-let routeCells: number[] = []
+let routeMask: Buffer = null
+
+function cellMask(count: number, cells: number[]): Buffer {
+let result = control.createBuffer(count)
+for (let i = 0; i < cells.length; i++) if (cells[i] >= 0 && cells[i] < count) result.setUint8(cells[i], 1)
+return result
+}
 
 export function enemyPathCells(layout: farmTypes.Layout): number[] {
 let result: number[] = []
+let excluded = cellMask(layout.ground.length, layout.cropTiles)
+for (let i = 0; i < layout.taskTiles.length; i++) excluded.setUint8(layout.taskTiles[i], 1)
+for (let i = 0; i < layout.defenderSlots.length; i++) excluded.setUint8(layout.defenderSlots[i].tile, 1)
+let seen = control.createBuffer(layout.ground.length)
 for (let i = 0; i < layout.routes.length; i++) for (let j = 0; j < layout.routes[i].tiles.length; j++) {
 let tile = layout.routes[i].tiles[j]
-if (tile < 0 || tile >= layout.ground.length || layout.walls[tile]) continue
+if (tile < 0 || tile >= layout.ground.length || layout.walls[tile] || seen.getUint8(tile) || excluded.getUint8(tile)) continue
 let ground = layout.ground[tile]
 if (ground == 9 || ground == 12 || (ground >= 4 && ground <= 7)) continue
-if (layout.cropTiles.indexOf(tile) >= 0 || layout.taskTiles.indexOf(tile) >= 0) continue
-let soil = false
-for (let k = 0; k < layout.defenderSlots.length; k++) if (layout.defenderSlots[k].tile == tile) soil = true
-if (!soil && result.indexOf(tile) < 0) result.push(tile)
+seen.setUint8(tile, 1)
+result.push(tile)
 }
 return result
 }
@@ -19536,16 +20021,21 @@ function material(layout: farmTypes.Layout, x: number, y: number): string {
 if (x < 0 || y < 0 || x >= layout.width || y >= layout.height) return ""
 let cell = y * layout.width + x
 let ground = layout.ground[cell]
-if (routeLayout != layout) { routeLayout = layout; routeCells = enemyPathCells(layout) }
-if (routeCells.indexOf(cell) >= 0) return "enemy.path"
+if (routeLayout != layout) { routeLayout = layout; routeMask = cellMask(layout.ground.length, enemyPathCells(layout)) }
+if (routeMask.getUint8(cell) != 0) return "enemy.path"
+// Existing source ground codes distinguish water and building floors.
+// Every other exterior blocking cell is a boundary wall or inner fence.
+if (layout.interior <= 0 && layout.walls[cell] && ground != 9 && ground != 8 && ground != 10 && ground != 11) {
+return x == 0 || y == 0 || x == layout.width - 1 || y == layout.height - 1 ? "wall" : "fence"
+}
 if (ground == 12) return "fence"
 if (ground == 2) {
-if (walkingLayout != layout) { walkingLayout = layout; walkingCells = farmLayout.walkingTiles(layout) }
-return walkingCells.indexOf(cell) >= 0 ? "stone.path" : "path"
+if (walkingLayout != layout) { walkingLayout = layout; walkingMask = cellMask(layout.ground.length, farmLayout.walkingTiles(layout)) }
+return walkingMask.getUint8(cell) != 0 ? "stone.path" : "path"
 }
 if (ground == 3) {
 if (layout.interior > 0) return x == 0 || y == 0 || x == layout.width - 1 || y == layout.height - 1 ? "room.wall" : "room.counter"
-return "cliff"
+return x == 0 || y == 0 || x == layout.width - 1 || y == layout.height - 1 ? "wall" : "fence"
 }
 if (ground == 4) return "soil"
 if (ground == 5) return "soil.dry"
@@ -19553,7 +20043,7 @@ if (ground == 6) return "soil.wet"
 if (ground == 7) return "soil.inactive"
 if (ground == 8 || ground == 10 || ground == 11) return "floor"
 if (ground == 9) return "water"
-if (layout.walls[cell]) return "cliff"
+if (layout.walls[cell]) return x == 0 || y == 0 || x == layout.width - 1 || y == layout.height - 1 ? "wall" : "fence"
 return "grass"
 }
 
@@ -19594,15 +20084,7 @@ if (row == 2) { result.fillRect(0, 15, 16, 1, 15); result.fillRect(1, 14, 14, 1,
 if (col == 0) { result.fillRect(0, 0, 1, 16, 15); result.fillRect(1, 1, 1, 14, 12) }
 if (col == 2) { result.fillRect(15, 0, 1, 16, 15); result.fillRect(14, 1, 1, 14, 12) }
 } else if (family == "fence") {
-result = farmWorldArt.tile("grass", 4).clone()
-let source = farmWorldArt.object("fence.horizontal")
-if (variant == 1) {
-// A source-derived vertical rail; cache the rotation once.
-for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
-let color = source.getPixel(y + 16, 15 - x)
-if (color) result.setPixel(x, y, color)
-}
-} else result.drawTransparentImage(source, -16, 0)
+result = farmWorldArt.object("fence." + variant)
 } else result = farmWorldArt.tile(family, variant)
 if (floorBackground) {
 result = result.clone()
@@ -19627,12 +20109,12 @@ return soilFamily(family) ? soilFamily(neighbor) : neighbor == family
 }
 
 function variant(layout: farmTypes.Layout, family: string, x: number, y: number): number {
-if (family == "grass" || family == "floor" || family == "cliff" || family == "room.wall" || (family == "soil" && layout.area == 0)) return 4
+if (family == "grass" || family == "floor" || family == "cliff" || family == "wall" || family == "room.wall" || (family == "soil" && layout.area == 0)) return 4
 let north = sameBed(layout, family, x, y - 1)
 let south = sameBed(layout, family, x, y + 1)
 let west = sameBed(layout, family, x - 1, y)
 let east = sameBed(layout, family, x + 1, y)
-if (family == "fence") return (north || south) && !west && !east ? 1 : 0
+if (family == "fence") return (north ? 1 : 0) + (east ? 2 : 0) + (south ? 4 : 0) + (west ? 8 : 0)
 if (soilFamily(family) && !north && !south && !west && !east) return 9
 // Soil states share one boundary. Dry/wet/inactive transitions never
 // introduce false green edges in the middle of the same authored bed.
@@ -19655,7 +20137,7 @@ return result
 
 export function render(layout: farmTypes.Layout, progress: farmTypes.Progress): void {
 let count = layout.width * layout.height
-let blocked = blockedExitCells(layout, progress)
+let blocked = cellMask(count, blockedExitCells(layout, progress))
 let data = control.createBuffer(4 + count)
 data.setNumber(NumberFormat.UInt16LE, 0, layout.width)
 data.setNumber(NumberFormat.UInt16LE, 2, layout.height)
@@ -19669,8 +20151,8 @@ bank.push(image.create(16, 16))
 bank[14].drawTransparentImage(farmArt.frame("object.barrier.closed", 0), -8, -8)
 for (let y = 0; y < layout.height; y++) {
 for (let x = 0; x < layout.width; x++) {
-let closed = blocked.indexOf(y * layout.width + x) >= 0
-let family = closed ? "cliff" : material(layout, x, y)
+let closed = blocked.getUint8(y * layout.width + x) != 0
+let family = closed ? "wall" : material(layout, x, y)
 let selected = closed ? 4 : variant(layout, family, x, y)
 // Barn-floor defender beds inherit the surrounding source wood
 // instead of stamping source grass into an indoor floor.
@@ -19691,12 +20173,12 @@ for (let i = 0; i < layout.objects.length; i++) {
 let object = layout.objects[i]
 if (object.kind != farmTypes.ObjectKind.Barrier || progress.unlocked[object.arg]) continue
 let cell = Math.floor(object.y / 16) * layout.width + Math.floor(object.x / 16)
-if (blocked.indexOf(cell) < 0) data.setUint8(4 + cell, 14)
+if (blocked.getUint8(cell) == 0) data.setUint8(4 + cell, 14)
 }
 tiles.setCurrentTilemap(tiles.createTilemap(data, image.create(layout.width, layout.height), bank, TileScale.Sixteen))
 // Exact existing wall geometry, plus the same locked barrier cells.
 for (let y = 0; y < layout.height; y++) {
-for (let x = 0; x < layout.width; x++) if (layout.walls[y * layout.width + x] || blocked.indexOf(y * layout.width + x) >= 0) tiles.setWallAt(tiles.getTileLocation(x, y), true)
+for (let x = 0; x < layout.width; x++) if (layout.walls[y * layout.width + x] || blocked.getUint8(y * layout.width + x) != 0) tiles.setWallAt(tiles.getTileLocation(x, y), true)
 }
 for (let i = 0; i < layout.objects.length; i++) {
 let object = layout.objects[i]
@@ -19955,11 +20437,7 @@ sprite.setPosition(object.x, object.y + (object.kind == farmTypes.ObjectKind.Tra
 sprite.z = 6
 result.push(sprite)
 }
-let cannon = sprites.create(farmArt.frame("crop.cannon.rooted", 0), kind)
-cannon.setFlag(SpriteFlag.Ghost, true)
-cannon.setPosition(44 * 16 + 8, 21 * 16 + 8 - 29)
-cannon.z = 3
-result.push(cannon)
+
 }
 for (let y = 3; y < layout.height - 3; y += 5) {
 for (let x = 3; x < layout.width - 3; x += 6) {
@@ -19974,6 +20452,74 @@ result.push(sprite)
 }
 }
 return result
+}
+}
+
+// SUPPLIED SOURCE: hud.ts
+// Conserve usage: reuse the pinned Mini Menu renderer and its cached text/layout.
+// Presentation only: never owns info.life/score, controller events or game over.
+namespace farmHud {
+let surface: miniMenu.MenuSprite = null
+let rows: miniMenu.MenuItem[] = []
+let lastHp = -1
+let lastGold = -1
+let lastNext = ""
+
+export function start(): void {
+if (surface) return
+surface = new miniMenu.MenuSprite()
+surface.setButtonEventsEnabled(false)
+surface.setFlag(SpriteFlag.Ghost, true)
+surface.setFlag(SpriteFlag.RelativeToCamera, true)
+surface.z = 20000
+surface.menuStyle.columns = 1
+surface.menuStyle.rows = 0
+surface.menuStyle.disabledItemsSelectable = false
+surface.menuStyle.backgroundColor = 1
+surface.menuStyle.borderColor = 12
+surface.menuStyle.border = miniMenu.createBorderBox(0, 0, 0, 1)
+surface.menuStyle.padding = miniMenu.createBorderBox(6, 2, 6, 2)
+surface.setStyleProperty(miniMenu.StyleKind.All, miniMenu.StyleProperty.Foreground, 15)
+surface.setStyleProperty(miniMenu.StyleKind.All, miniMenu.StyleProperty.Background, 1)
+surface.setStyleProperty(miniMenu.StyleKind.All, miniMenu.StyleProperty.Padding, miniMenu.createBorderBox(2, 2, 2, 2))
+for (let i = 0; i < 3; i++) rows.push(miniMenu.createMenuItem(" ", null, true))
+surface.setMenuItems(rows)
+surface.setDimensions(screen.width, 42)
+surface.setPosition(screen.width / 2, 21)
+surface.setFlag(SpriteFlag.Invisible, true)
+}
+
+function text(row: number, value: string): void {
+rows[row].setText(value.length ? value : " ")
+rows[row]._font = image.font8
+rows[row]._isDirty = true
+}
+
+// World supplies earned state and current guidance. Stable values do not
+// allocate strings, images or menu items each update. Menu content is inert.
+export function update(hp: number, gold: number, next: string, visible: boolean): void {
+if (!surface) start()
+surface.setFlag(SpriteFlag.Invisible, !visible)
+if (lastHp != hp || lastGold != gold) {
+lastHp = hp
+lastGold = gold
+text(0, "HP " + hp + "     GOLD " + gold)
+}
+if (lastNext != next) {
+lastNext = next
+let message = next.length ? "Next: " + next : ""
+let capacity = Math.floor((screen.width - 16) / image.font8.charWidth)
+let split = Math.min(message.length, capacity)
+if (message.length > capacity) {
+let space = -1
+for (let i = 0; i < capacity; i++) if (message.charAt(i) == " ") space = i
+if (space > 0) split = space
+}
+text(1, message.substr(0, split))
+let remainder = split
+while (remainder < message.length && message.charAt(remainder) == " ") remainder++
+text(2, message.substr(remainder))
+}
 }
 }
 
@@ -21076,6 +21622,10 @@ export function attackCue(facingX: number, facingY: number): void {
 attackCueMs = 120
 attackCueX = facingX
 attackCueY = facingY
+}
+export function face(x: number, y: number): void {
+direction = x < 0 ? 2 : x > 0 ? 3 : y < 0 ? 1 : 0
+elapsed = 0
 }
 export function attach(logical: Sprite): void {
 if (!logical) return
@@ -30791,15 +31341,21 @@ let y = Math.floor(o.y / 16)
 protect(layout, safe, x, y, o.kind == farmTypes.ObjectKind.Exit ? 2 : 1)
 connect(layout, safe, y * layout.width + x)
 }
+// Build gate membership once; do not allocate/re-search every Exit's
+// corridor for every perimeter tile during a restart.
+let gateCells: number[] = []
+for (let i = 0; i < layout.ground.length; i++) gateCells.push(0)
+for (let i = 0; i < layout.objects.length; i++) {
+if (layout.objects[i].kind != farmTypes.ObjectKind.Exit) continue
+let corridor = exitCells(layout, layout.objects[i])
+for (let j = 0; j < corridor.length; j++) gateCells[corridor[j]] = 1
+}
 for (let y = 0; y < layout.height; y++) {
 for (let x = 0; x < layout.width; x++) {
 let cell = y * layout.width + x
 // Only authored Exit corridors may interrupt the outer stone wall.
 if (x == 0 || y == 0 || x == layout.width - 1 || y == layout.height - 1) {
-let gate = false
-for (let i = 0; i < layout.objects.length; i++) {
-if (layout.objects[i].kind == farmTypes.ObjectKind.Exit && exitCells(layout, layout.objects[i]).indexOf(cell) >= 0) gate = true
-}
+let gate = gateCells[cell] == 1
 layout.walls[cell] = gate ? 0 : 1
 layout.ground[cell] = gate ? 2 : 3
 }
@@ -31393,7 +31949,7 @@ return farmCombat.test(context, predicate, value)
 
 // SUPPLIED SOURCE: save.ts
 // Package-private persistence implementation for 01-world (MF-CONTRACT-1.0).
-// Only this package writes the three Magical Farm settings keys. The envelope
+// Only this package writes Magical Farm settings keys. The envelope
 // deliberately stores numeric arrays so the same project/save remains native
 // MakeCode Arcade data rather than browser/localStorage state.
 namespace farmSave {
@@ -31401,6 +31957,23 @@ export const SCHEMA_VERSION = 1
 export const KEY_SLOT_A = "mf.v1.a"
 export const KEY_SLOT_B = "mf.v1.b"
 export const KEY_HEAD = "mf.v1.head"
+export const KEY_RESUME = "mf.v1.resume"
+
+// Static residence is small enough to commit after each visible movement
+// without repeatedly copying/encoding every crop and earned capability.
+// Existing v1 full saves remain byte/schema compatible. Raids freeze this
+// record at their stable pre-raid position; no live battle is serialized.
+export class Resume {
+constructor() {}
+area: number = 0
+interior: number = 0
+door: number = -1
+x: number = 0 // native Fx8 coordinates
+y: number = 0
+facingX: number = 0
+facingY: number = 1
+playedMs: number = 0
+}
 
 // Envelope layout (all integral numbers):
 // [0] schema version
@@ -31761,7 +32334,7 @@ return c
 }
 
 export function isGameKey(key: string): boolean {
-return key == KEY_SLOT_A || key == KEY_SLOT_B || key == KEY_HEAD
+return key == KEY_SLOT_A || key == KEY_SLOT_B || key == KEY_HEAD || key == KEY_RESUME
 }
 
 export function load(): LoadResult {
@@ -31828,10 +32401,51 @@ lastSlot = target
 return true
 }
 
+function resumeChecksum(data: number[]): number {
+let h = 104729
+for (let i = 0; i < data.length - 1; i++) {
+if (!integer(data[i])) return -1
+let folded = data[i] % CHECK_MOD
+if (folded < 0) folded += CHECK_MOD
+h = (h * 131 + folded + i + 1) % CHECK_MOD
+}
+return h
+}
+
+function validResume(r: Resume): boolean {
+if (!r || !integer(r.area) || r.area < 0 || r.area > 12) return false
+if (!integer(r.interior) || r.interior < 0 || r.interior > 2 || (r.interior > 0 && r.area != 0)) return false
+if (!integer(r.door) || r.door < -1 || r.door > MAX_SLOT_ID) return false
+if (!integer(r.x) || !integer(r.y) || r.x < 0 || r.y < 0 || r.x >= 64 * 16 * 256 || r.y >= 64 * 16 * 256) return false
+if (!integer(r.facingX) || !integer(r.facingY) || Math.abs(r.facingX) + Math.abs(r.facingY) != 1) return false
+return integer(r.playedMs) && r.playedMs >= 0 && r.playedMs <= 1000000000000
+}
+
+export function readResume(area: number, revision: number = 0): Resume {
+if (writesBlocked) return null
+let data = settings.readNumberArray(KEY_RESUME)
+if (!data || data.length != 11 || data[0] != 1 || !validNumberArray(data)) return null
+if (revision == 0) revision = lastRevision
+if (data[1] < 1 || data[1] > revision || data[2] != area || resumeChecksum(data) != data[10]) return null
+let r = new Resume()
+r.area = data[2]; r.interior = data[3]; r.door = data[4]
+r.x = data[5]; r.y = data[6]; r.facingX = data[7]; r.facingY = data[8]; r.playedMs = data[9]
+return validResume(r) ? r : null
+}
+
+export function writeResume(r: Resume): boolean {
+if (writesBlocked || lastRevision < 1 || !validResume(r)) return false
+let data: number[] = [1, lastRevision, r.area, r.interior, r.door, r.x, r.y, r.facingX, r.facingY, r.playedMs, 0]
+data[10] = resumeChecksum(data)
+settings.writeNumberArray(KEY_RESUME, data)
+return true
+}
+
 export function reset(): void {
 settings.remove(KEY_SLOT_A)
 settings.remove(KEY_SLOT_B)
 settings.remove(KEY_HEAD)
+settings.remove(KEY_RESUME)
 lastRevision = 0
 lastSlot = -1
 writesBlocked = false
@@ -40569,7 +41183,7 @@ const EXPANSION_LABEL_TIER2: string[] = ["", "SEED BUNDLE II", "", "", "", "", "
 const STARTING_GOLD = 0
 const STARTING_HP = 20
 const STARTING_MOVE_SPEED = 180
-const SAVE_DEBOUNCE_MS = 1000
+const SAVE_DEBOUNCE_MS = 10000
 const NOTICE_MS = 1200
 const MAX_UPDATE_DT_MS = 100
 const TILE_SIZE = 16
@@ -40625,7 +41239,6 @@ let facingY = 1
 let noticeText = ""
 let noticeUntil = 0
 let workDirty = false
-let workDirtySince = 0
 let nextInstruction = ""
 let nextInstructionLines: string[] = []
 let nextObjectId = -1
@@ -40660,6 +41273,9 @@ let lastResultTokenByTask: number[] = []
 let activeRaidArea = 0
 let raidRecoveryProgress: farmTypes.Progress = null
 let raidRecoveryFarm: number[] = []
+let raidRecoveryResume: farmSave.Resume = null
+let startupResume: farmSave.Resume = null
+let lastResume: farmSave.Resume = null
 
 // Step 9: one world-owned active-play/update clock and one safe scene
 // transition gate. A transition first cancels learner contexts, then waits
@@ -40729,6 +41345,7 @@ function clearRaidRecovery(): void {
 activeRaidArea = 0
 raidRecoveryProgress = null
 raidRecoveryFarm = []
+raidRecoveryResume = null
 }
 
 function cloneProgress(source: farmTypes.Progress): farmTypes.Progress {
@@ -40896,12 +41513,16 @@ for (let area = 1; area <= 12; area++) if (progress.phase[area] == farmTypes.Pha
 return false
 }
 
-function tryLoadSnapshot(snapshot: farmSave.Snapshot): boolean {
+function tryLoadSnapshot(snapshot: farmSave.Snapshot, revision: number = 0): boolean {
 if (!snapshot || !snapshot.progress) return false
 // Package 02 validates its entire opaque payload before mutating. Only
 // after that succeeds do we replace world Progress authority.
 if (!farmTasks.importState(snapshot.farm)) return false
 currentProgress = cloneProgress(snapshot.progress)
+startupResume = farmSave.readResume(currentProgress.area, revision)
+// Only the known building entrances may reconnect an interior save.
+// Invalid optional residence data never invalidates earned progress.
+if (startupResume && startupResume.interior > 0 && startupResume.door != 71 + startupResume.interior) startupResume = null
 return true
 }
 
@@ -41651,6 +42272,9 @@ let preProgress = cloneProgress(currentProgress)
 let preFarm = farmTasks.exportState()
 if (!preFarm) { notice("COULD NOT SAVE RAID SETUP"); return }
 
+saveResume(true)
+raidRecoveryResume = farmSave.readResume(area)
+
 raidRecoveryProgress = cloneProgress(preProgress)
 raidRecoveryFarm = cloneNumberArray(preFarm)
 activeRaidArea = area
@@ -41817,7 +42441,7 @@ return
 
 function periodicCheckpoint(): void {
 if (!currentProgress || saveBlocked || farmSave.blocked() || resetPendingRestart) return
-if (programBusy()) return
+if (programBusy() || hasActiveRaid()) return
 if (currentProgress.playedMs - lastPeriodicCheckpointClock < SAVE_DEBOUNCE_MS) return
 checkpoint("elapsed-progress")
 }
@@ -41858,12 +42482,15 @@ finishPendingTransition()
 maybeTriggerExit()
 }
 periodicCheckpoint()
-if (workDirty && now - workDirtySince >= 120) checkpoint("visible-work")
+// Commit changed physical work before its next rendered frame. Edits
+// and Stop must not discard a visibly planted/watered plot.
+if (workDirty && !hasActiveRaid()) checkpoint("visible-work")
 if (now >= nextUpdateMs) {
 nextUpdateMs = now + 200
 updateNextInstruction()
 }
 updateInteractionCue()
+saveResume(false)
 }
 
 function updateInteractionCue(): void {
@@ -42046,16 +42673,7 @@ facingY = vy < 0 ? -1 : 1
 
 function drawHud(): void {
 if (!started || !currentProgress) return
-// Sparse persistent HUD only: HP and gold. World-local resources remain
-// on their objects/plants and are never promoted to global meters.
-screen.fillRect(6, 6, 86, 20, 1)
-screen.print("HP " + playerHp, 12, 12, 15, image.font8)
-screen.fillRect(VIEWPORT_WIDTH - 124, 6, 118, 20, 1)
-screen.print("GOLD " + currentProgress.gold, VIEWPORT_WIDTH - 116, 12, 15, image.font8)
-if (!menuOpen && nextInstruction) {
-screen.fillRect(6, 30, VIEWPORT_WIDTH - 12, 30, 1)
-for (let i = 0; i < nextInstructionLines.length && i < 2; i++) screen.print(nextInstructionLines[i], 12, 35 + i * 10, 15, image.font8)
-}
+farmHud.update(playerHp, currentProgress.gold, nextInstruction, !menuOpen)
 }
 
 function drawNotice(): void {
@@ -42097,6 +42715,7 @@ if (!saveBlocked) farmCombat.attack()
 function installUiAndControls(): void {
 if (uiInstalled) return
 uiInstalled = true
+farmHud.start()
 controller.A.onEvent(ControllerButtonEvent.Pressed, onAPressed)
 controller.B.onEvent(ControllerButtonEvent.Pressed, onBPressed)
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () { if (menuOpen) { if (quantityMenu) changeQuantity(10); else moveMenu(-1) } })
@@ -42168,7 +42787,10 @@ function finishStartup(): void {
 if (!currentProgress) currentProgress = freshProgress()
 let area = currentProgress.area
 if (!layoutAreaValid(area)) area = 1
-if (!loadRegion(area, -1) && area != 1) loadRegion(1, -1)
+let room = startupResume ? startupResume.interior : 0
+let door = startupResume ? startupResume.door : -1
+if (!loadRegion(area, door, room) && area != 1) loadRegion(1, -1)
+if (startupResume) restoreResume(startupResume)
 lastUpdateMs = control.millis()
 lastPeriodicCheckpointClock = currentProgress.playedMs
 clearPendingTransition()
@@ -42197,7 +42819,7 @@ return
 
 if (loaded.primary) {
 let primaryRecoveredRaid = candidateNeedsRaidRecovery(loaded.primary)
-if (tryLoadSnapshot(candidateSnapshot(loaded.primary))) {
+if (tryLoadSnapshot(candidateSnapshot(loaded.primary), loaded.primary.revision)) {
 finishStartup()
 // Normalize an interrupted RAID into a newer stable PREP save
 // after both World and Farming recovery data have validated.
@@ -42205,7 +42827,7 @@ if (primaryRecoveredRaid) checkpoint("interrupted-raid-recovery")
 return
 }
 let alternateRecoveredRaid = candidateNeedsRaidRecovery(loaded.alternate)
-if (loaded.alternate && tryLoadSnapshot(candidateSnapshot(loaded.alternate))) {
+if (loaded.alternate && tryLoadSnapshot(candidateSnapshot(loaded.alternate), loaded.alternate.revision)) {
 finishStartup()
 if (alternateRecoveredRaid) checkpoint("interrupted-raid-recovery")
 return
@@ -42322,6 +42944,7 @@ return
 }
 currentProgress = cloneProgress(raidRecoveryProgress)
 playerHp = STARTING_HP
+restoreResume(raidRecoveryResume)
 clearRaidRecovery()
 checkpoint("raid-failure")
 notice("RAID FAILED - SETUP RESTORED")
@@ -42398,30 +43021,82 @@ return true
 
 export function checkpoint(reason: string): void {
 if (!ensureProgress() || saveBlocked || farmSave.blocked()) return
+// The raid boundary was committed before Combat began. Preserve it;
+// transient combat positions/crops/clock are never written mid-raid.
+if (hasActiveRaid()) return
 let farm = farmTasks.exportState()
 if (!farm) return
-let written = false
-if (hasRaidPhase(currentProgress) && raidRecoveryProgress) {
-written = farmSave.write(currentProgress, farm, raidRecoveryProgress, raidRecoveryFarm)
-} else {
-written = farmSave.write(currentProgress, farm)
-}
+let written = farmSave.write(currentProgress, farm)
 if (written) {
 lastPeriodicCheckpointClock = currentProgress.playedMs
 workDirty = false
+saveResume(true)
 }
 }
 
 // Physical work is saved independently of code or invocation verdicts.
-// Coalesce operations so long loops do not write three settings keys per item.
+// Coalesce operations within one update; flush before visible rendering.
 export function dirtyWork(): void {
-if (!workDirty) workDirtySince = control.millis()
 workDirty = true
 }
 
 export function clock(): number {
 if (!currentProgress) return 0
 return currentProgress.playedMs
+}
+
+function residence(): farmSave.Resume {
+let r = new farmSave.Resume()
+r.area = currentProgress.area
+r.interior = currentLayout.interior
+r.door = interiorDoorObjectId
+r.x = Math.round(currentPlayer.x * 256)
+r.y = Math.round(currentPlayer.y * 256)
+r.facingX = facingX; r.facingY = facingY
+r.playedMs = currentProgress.playedMs
+return r
+}
+
+function saveResume(force: boolean): void {
+if (!currentProgress || !currentLayout || !currentPlayer || !farmAvatar.saved() || !canPersistMutation() || hasActiveRaid() || transitionPending()) return
+let x = Math.round(currentPlayer.x * 256), y = Math.round(currentPlayer.y * 256)
+// Compare primitive values first, so an unchanged frame allocates none.
+if (!force && lastResume && lastResume.area == currentProgress.area && lastResume.interior == currentLayout.interior
+&& lastResume.door == interiorDoorObjectId && lastResume.x == x && lastResume.y == y
+&& lastResume.facingX == facingX && lastResume.facingY == facingY
+&& Math.floor(lastResume.playedMs / 1000) == Math.floor(currentProgress.playedMs / 1000)) return
+let r = residence()
+if (farmSave.writeResume(r)) lastResume = r
+}
+
+function restoreResume(r: farmSave.Resume): boolean {
+if (!r || !currentPlayer || !currentLayout || r.area != currentProgress.area || r.interior != currentLayout.interior) return false
+let x = r.x / 256, y = r.y / 256
+if (x < 0 || y < 0 || x >= currentLayout.width * TILE_SIZE || y >= currentLayout.height * TILE_SIZE) return false
+// Validate the same nontransparent logical body used by Arcade. Do not
+// reject legal wall-adjacent positions using an oversized visual box.
+let im = currentPlayer.image
+let left = im.width, top = im.height, right = -1, bottom = -1
+for (let yy = 0; yy < im.height; yy++) for (let xx = 0; xx < im.width; xx++) if (im.getPixel(xx, yy)) {
+left = Math.min(left, xx); right = Math.max(right, xx)
+top = Math.min(top, yy); bottom = Math.max(bottom, yy)
+}
+if (right < 0) return false
+let firstX = Math.floor((x - im.width / 2 + left) / TILE_SIZE)
+let lastX = Math.floor((x - im.width / 2 + right) / TILE_SIZE)
+let firstY = Math.floor((y - im.height / 2 + top) / TILE_SIZE)
+let lastY = Math.floor((y - im.height / 2 + bottom) / TILE_SIZE)
+for (let yy = firstY; yy <= lastY; yy++) for (let xx = firstX; xx <= lastX; xx++) {
+if (xx < 0 || yy < 0 || xx >= currentLayout.width || yy >= currentLayout.height || tiles.tileAtLocationIsWall(tiles.getTileLocation(xx, yy))) return false
+}
+currentPlayer.setPosition(x, y)
+facingX = r.facingX; facingY = r.facingY
+currentProgress.playedMs = Math.max(currentProgress.playedMs, r.playedMs)
+farmAvatar.face(facingX, facingY)
+farmAvatar.update(0)
+lastResume = r
+updateNextInstruction()
+return true
 }
 }
 
