@@ -37024,10 +37024,19 @@ return slot.rangeTiles
 
 function enemyInDefenderRange(defender: DefenderRuntime, enemy: EnemyRuntime, radiusTiles: number, requiresGroundContact: boolean): boolean {
 if (!activeRootedDefender(defender) || !validDefenderEnemyTarget(enemy, requiresGroundContact)) return false
+// Direct-flight Wisps leave authored ground-route cells. Ordinary ranged
+// attacks still reach them inside the actual tuned world-space radius.
+if (enemy.airborne) return airborneInDefenderRadius(defender, enemy, radiusTiles)
 let slot = slotById(defender.slot)
 if (!slot) return false
 let tiles = rangeTilesForSlot(slot, radiusTiles)
 return containsNumber(tiles, enemy.tile)
+}
+
+function airborneInDefenderRadius(defender: DefenderRuntime, enemy: EnemyRuntime, radiusTiles: number): boolean {
+if (!defender || !enemy || !enemy.airborne || radiusTiles <= 0) return false
+let radiusPx = radiusTiles * TILE_SIZE
+return distanceSquared(defenderAnchorX(defender), defenderAnchorY(defender), enemy.visualX, enemy.visualY) <= radiusPx * radiusPx
 }
 
 function candidateEnemiesForDefender(defender: DefenderRuntime, requiresGroundContact: boolean, radiusTiles: number): EnemyRuntime[] {
@@ -37044,9 +37053,21 @@ if (containsNumber(seen, ids[i])) continue
 let enemy = enemyById(ids[i])
 if (!validDefenderEnemyTarget(enemy, requiresGroundContact)) continue
 if (defender.previewOnly != enemy.previewOnly) continue
+if (enemy.airborne && !airborneInDefenderRadius(defender, enemy, radiusTiles)) continue
 result.push(enemy)
 seen.push(ids[i])
 }
+}
+// The existing enemy cap bounds this additional pass. Ground acquisition
+// keeps its authored masks; only airborne candidates use physical radius.
+for (let i = 0; i < enemies.length; i++) {
+let enemy = enemies[i]
+if (containsNumber(seen, enemy.id) || !enemy.airborne) continue
+if (!validDefenderEnemyTarget(enemy, requiresGroundContact)) continue
+if (defender.previewOnly != enemy.previewOnly) continue
+if (!airborneInDefenderRadius(defender, enemy, radiusTiles)) continue
+result.push(enemy)
+seen.push(enemy.id)
 }
 return result
 }
