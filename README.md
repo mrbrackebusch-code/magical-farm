@@ -73,6 +73,7 @@ farm.onWater(function (job) {
 
 ```package
 arcade-mini-menu=github:riknoll/arcade-mini-menu#v0.1.0
+pxt-status-bar=github:jwunderl/pxt-status-bar#v0.4.1
 ```
 
 ```template
@@ -249,9 +250,9 @@ return ""
 // Frozen MF-CONTRACT-1.0. Registration/action bridge only; no learner algorithms.
 //% color=#477d37 block="Farm jobs" weight=90
 namespace farm {
-//% blockId=mf_onplant block="on planting requested" draggableParameters="reporter"
+//% blockId=mf_onplant block="when planting helpers are called" draggableParameters="reporter"
 export function onPlant(handler: (job: number) => void): void { farmProgram.register(farmTypes.Task.Plant, handler) }
-//% blockId=mf_onwater block="on watering requested" draggableParameters="reporter"
+//% blockId=mf_onwater block="when watering helpers are called" draggableParameters="reporter"
 export function onWater(handler: (job: number) => void): void { farmProgram.register(farmTypes.Task.Water, handler) }
 //% blockId=mf_ontrellis block="on trellis work requested" draggableParameters="reporter"
 export function onTrellis(handler: (job: number) => void): void { farmProgram.register(farmTypes.Task.Trellis, handler) }
@@ -275,9 +276,9 @@ export function onWash(handler: (job: number) => void): void { farmProgram.regis
 export function onPack(handler: (job: number) => void): void { farmProgram.register(farmTypes.Task.Pack, handler) }
 //% blockId=mf_ongrove block="on moon grove work requested" draggableParameters="reporter"
 export function onGrove(handler: (job: number) => void): void { farmProgram.register(farmTypes.Task.Grove, handler) }
-//% blockId=mf_plantnext block="plant next plot for job $job"
+//% blockId=mf_plantnext block="have helper plant next plot for job $job"
 export function plantNext(job: number): void { farmProgram.action(job, farmTypes.Action.PlantNext, 0) }
-//% blockId=mf_waternext block="water next dry plot for job $job"
+//% blockId=mf_waternext block="have helper water next dry plot for job $job"
 export function waterNext(job: number): void { farmProgram.action(job, farmTypes.Action.WaterNext, 0) }
 //% blockId=mf_placepost block="place next trellis post for job $job"
 export function placePost(job: number): void { farmProgram.action(job, farmTypes.Action.PlacePost, 0) }
@@ -20566,11 +20567,10 @@ return lines
 
 // SUPPLIED SOURCE: hud.ts
 // Conserve usage: reuse the shared stock frame, text and measured layout.
-// Presentation only: World owns HP/gold, controller events, timers and saves.
+// Presentation only: World owns gold, controller events, timers and saves.
 namespace farmHud {
 let surface: miniMenu.MenuSprite = null
 let rows: miniMenu.MenuItem[] = []
-let lastHp = -1
 let lastGold = -1
 let lastNext = ""
 let noticeSurface: miniMenu.MenuSprite = null
@@ -20601,13 +20601,12 @@ rows[row].setText(value.length ? value : " ")
 farmUiTheme.applyFont(rows[row], true)
 }
 
-export function update(hp: number, gold: number, next: string, visible: boolean): void {
+export function update(gold: number, next: string, visible: boolean): void {
 if (!surface) start()
 surface.setFlag(SpriteFlag.Invisible, !visible)
-if (lastHp != hp || lastGold != gold) {
-lastHp = hp
+if (lastGold != gold) {
 lastGold = gold
-text(0, "HP " + hp + "     GOLD " + gold)
+text(0, "GOLD " + gold)
 }
 if (lastNext != next) {
 lastNext = next
@@ -32661,6 +32660,7 @@ let activeArea = 0
 let activeLayout: farmTypes.Layout = null
 let helper: Sprite = null
 let helperKey = ""
+let helperToken = -1
 let workPulse: Sprite = null
 let workPulseImages: Image[] = []
 let workPulseSerial = 0
@@ -32911,10 +32911,40 @@ return helper
 function moveHelperToPixel(context: farmTypes.Context, x: number, y: number): boolean {
 if (context.cancelled) return false
 let actor = ensureHelper(context.task)
+helperToken = context.token
 // Poof directly to this authored work target, never simulated pathfinding.
 actor.setPosition(x, y - 12)
 actor.z = y + 2
-return true
+actor.startEffect(effects.confetti, 160)
+actor.y -= 5
+pause(100)
+if (!helperCurrent(context, actor)) return false
+actor.y += 5
+pause(100)
+return helperCurrent(context, actor)
+}
+
+function helperCurrent(context: farmTypes.Context, actor: Sprite): boolean {
+return !context.cancelled && context.area == activeArea && helper == actor && helperToken == context.token
+}
+
+function farewellHelper(context: farmTypes.Context): void {
+let actor = helper
+if (!actor || !helperCurrent(context, actor)) return
+// A little side-to-side hop makes the completed job visible before poof.
+let x = actor.x
+let y = actor.y
+for (let beat = 0; beat < 3; beat++) {
+actor.setPosition(x + (beat % 2 == 0 ? 5 : -5), y - 5)
+pause(90)
+if (!helperCurrent(context, actor)) return
+actor.setPosition(x, y)
+pause(60)
+if (!helperCurrent(context, actor)) return
+}
+actor.startEffect(effects.confetti, 180)
+pause(100)
+if (helperCurrent(context, actor)) actor.setFlag(SpriteFlag.Invisible, true)
 }
 
 function showWorkPulse(context: farmTypes.Context): void {
@@ -32934,11 +32964,11 @@ workPulse.z = actor.z + 1
 // A short off/on edge distinguishes even repetitions at the same plot.
 workPulse.setFlag(SpriteFlag.Invisible, true)
 pause(30)
-if (context.cancelled || !helper || !workPulse) return
+if (!helperCurrent(context, actor) || !workPulse) return
 workPulse.setFlag(SpriteFlag.Invisible, false)
 actor.y -= 3
-pause(100)
-if (helper == actor) actor.y += 3
+pause(220)
+if (helperCurrent(context, actor)) actor.y += 3
 if (workPulse) workPulse.setFlag(SpriteFlag.Invisible, true)
 }
 
@@ -33320,6 +33350,7 @@ setSlotRegrowing(activeArea, localSlot)
 }
 refreshActiveCrops()
 farmWorld.checkpoint("harvest")
+farmWorld.notice("HARVESTED " + cropName(crop) + " +1. SELL HARVEST AT HOME.")
 maybeStartA1Regrow()
 return true
 }
@@ -34588,6 +34619,8 @@ result.mode = context.mode
 result.token = context.token
 result.trace = copyNumbers(context.trace)
 
+farewellHelper(context)
+
 let complete = context.task == farmTypes.Task.Irrigate ? evaluateIrrigation(context) : taskComplete(context)
 if (context.cancelled) {
 result.code = farmTypes.ResultCode.Cancelled
@@ -34605,7 +34638,7 @@ result.code = farmTypes.ResultCode.Wrong
 result.message = taskMessage(context.task) + " The visible farm state is not complete yet."
 }
 result.trace = copyNumbers(context.trace)
-if (helper) helper.setFlag(SpriteFlag.Invisible, true)
+if (helper && helperToken == context.token) helper.setFlag(SpriteFlag.Invisible, true)
 farmWorld.dirtyWork()
 return result
 }
@@ -34629,6 +34662,14 @@ let slot = SLOT_START[area] + local - 1
 if (slot >= cropState.length || cropState[slot] == CROP_EMPTY || cropState[slot] == CROP_WILTED) return area == 1 ? farmTypes.Task.Water : area + 1
 }
 return 0
+}
+
+// Read-only guidance selects a genuinely ripe crop, including saved growth.
+export function harvestReady(localSlot: number): boolean {
+if (activeArea < 1 || activeArea > 12 || localSlot < 1 || localSlot > activeCountForArea(activeArea)) return false
+syncProductionState()
+let slot = globalSlot(activeArea, localSlot)
+return slot > 0 && cropState[slot] == CROP_MATURE
 }
 
 export function ready(area: number): boolean {
@@ -34861,6 +34902,7 @@ namespace farmCombat {
 const EnemyKind = SpriteKind.create()
 const DefenderKind = SpriteKind.create()
 const ProjectileKind = SpriteKind.create()
+const EnemyHealthKind = StatusBarKind.create()
 
 // Static values mirrored from implementation/data/combat.json. Runtime cannot
 // read authoring JSON from disk, so later steps expand these into static tables.
@@ -34876,6 +34918,13 @@ let monsterFeet: number[] = []
 let weaponViews: Image[] = []
 let weaponView: Sprite = null
 let weaponViewUntil = 0
+let weaponViewStarted = 0
+let weaponViewDuration = 0
+let weaponViewReach = 0
+let weaponViewOriginX = 0
+let weaponViewOriginY = 0
+let weaponViewFacingX = 0
+let weaponViewFacingY = 1
 let operationCueImages: Image[] = []
 let operationCueSerial = 0
 const MAX_PENDING_CHILDREN = 32
@@ -34959,8 +35008,12 @@ const DAMAGE_ORDINARY = 1
 const DAMAGE_PIERCING = 2
 const DAMAGE_LIGHTNING = 3
 const DAMAGE_CONTROL = 4
-const PLAYER_CONTACT_GATE_MS = 600
 const DEFAULT_CROP_BITE_INTERVAL_MS = 1250
+// Starter crops protect their own beds after the learner actually plants and
+// waters them. This modest world behavior grants no later SixShooter power.
+const STARTER_GUARD_RANGE_PX = 96
+const STARTER_GUARD_DAMAGE = 2
+const STARTER_GUARD_INTERVAL_MS = 1200
 const REGEN_BLOCK_AFTER_DAMAGE_MS = 2000
 const REGEN_TICK_MS = 750
 const REGEN_HEAL_PER_TICK = 1
@@ -34982,9 +35035,8 @@ const PHASE_MITE_SOLID_MS = 3000
 const PHASE_MITE_PHASED_MS = 1250
 const PHASE_EFFECT_MS = 320
 
-// Raid orchestration. World owns the pre-raid checkpoint/rooting and player HP;
-// Combat observes HP only through farmWorld.playerHealth() per
-// MF-CONTRACT-1.0-COMBAT-SEAMS-01. Combat begins only after World has committed
+// Raid orchestration. World owns the pre-raid checkpoint/rooting. The hero
+// has no HP and enemies cannot damage the hero. Combat begins only after World has committed
 // Phase.Raid. Setup callbacks use
 // the student's current code, then the deterministic countdown/wave machine runs.
 const RAID_COUNTDOWN_MS = 3000
@@ -35076,6 +35128,7 @@ id: number = 0
 species: number = 0
 sprite: Sprite = null
 visual: Sprite = null
+healthBar: StatusBarSprite = null
 lastVisualY: number = 0
 attackViewUntil: number = 0
 epoch: number = 0
@@ -35119,7 +35172,6 @@ armor: number = 0
 minPositiveDamage: number = 0
 knockbackMultiplier: number = 1
 generation: number = 0
-contactDamage: number = 0
 
 lastDamagedMs: number = 0
 stateMs: number = 0
@@ -35336,11 +35388,10 @@ let nextEffectId = 1
 let nextRunnerSerial = 1
 let elapsedMs = 0
 
-// Player attack state is combat-local. World owns controller routing, health,
+// Player attack state is combat-local. World owns controller routing,
 // movement and equipped-weapon persistence. Facing follows world movement and
 // retains the last non-zero direction while the player is stationary.
 let playerAttackCooldownMs = 0
-let playerInvulnerableMs = 0
 let playerFacingX = 0
 let playerFacingY = 1
 
@@ -35357,6 +35408,7 @@ let raidPhaseElapsedMs = 0
 let raidScheduledSpawns: SpawnRequest[] = []
 let raidSetupWaitingActorIds: number[] = []
 let raidInitialCropCount = 0
+let starterGuardCooldowns: number[] = []
 
 let enemies: EnemyRuntime[] = []
 let defenders: DefenderRuntime[] = []
@@ -35460,9 +35512,24 @@ enemy.sprite.setFlag(SpriteFlag.Invisible, true)
 enemy.visual = sprites.create(monsterViews[(enemy.species - 1) * 2], EnemyKind)
 enemy.lastVisualY = enemy.visualY
 presentMonster(enemy, false)
+enemy.healthBar = statusbars.create(24, 4, EnemyHealthKind)
+enemy.healthBar.setColor(7, 2)
+enemy.healthBar.setBarBorder(1, 15)
+enemy.healthBar.attachToSprite(enemy.visual, 2, 0)
+enemy.healthBar.positionDirection(CollisionDirection.Top)
+syncEnemyHealthBar(enemy)
+}
+
+function syncEnemyHealthBar(enemy: EnemyRuntime): void {
+if (!enemy || !enemy.healthBar) return
+if (enemy.healthBar.max != enemy.maxHp) enemy.healthBar.max = enemy.maxHp
+if (enemy.healthBar.value != enemy.hp) enemy.healthBar.value = enemy.hp
+enemy.healthBar.z = enemy.visual.z + 1
 }
 
 function destroyEnemySprites(enemy: EnemyRuntime): void {
+destroyOwnedSprite(enemy.healthBar)
+enemy.healthBar = null
 destroyOwnedSprite(enemy.sprite)
 destroyOwnedSprite(enemy.visual)
 }
@@ -35473,6 +35540,7 @@ let enemy = enemies[i]
 if (!enemy.visual || enemy.pendingDestroy || !enemy.alive) continue
 let back = enemy.visualY < enemy.lastVisualY
 presentMonster(enemy, back)
+syncEnemyHealthBar(enemy)
 enemy.lastVisualY = enemy.visualY
 }
 }
@@ -35541,6 +35609,7 @@ raidPhaseElapsedMs = 0
 raidScheduledSpawns = []
 raidSetupWaitingActorIds = []
 raidInitialCropCount = 0
+starterGuardCooldowns = []
 }
 
 function hardCleanup(): void {
@@ -35560,7 +35629,6 @@ nextEffectId = 1
 // callback can never collide with a later active runner in a new epoch.
 elapsedMs = 0
 playerAttackCooldownMs = 0
-playerInvulnerableMs = 0
 playerFacingX = 0
 playerFacingY = 1
 }
@@ -36251,12 +36319,6 @@ if (species == 12) return 0.20
 return 1
 }
 
-function speciesContactDamage(species: number): number {
-if (species == 2 || species == 8 || species == 9 || species == 10 || species == 13) return 1
-if (species == 12) return 4
-return 2
-}
-
 // Step 5's spawner calls this single initializer so damage state cannot drift
 // away from combat.json. It is harmless before enemy creation exists.
 function configureEnemyCombat(enemy: EnemyRuntime, species: number): void {
@@ -36267,7 +36329,6 @@ enemy.armor = speciesArmor(species)
 enemy.minPositiveDamage = speciesMinPositiveDamage(species)
 enemy.shield = speciesShieldCharges(species)
 enemy.knockbackMultiplier = speciesKnockbackMultiplier(species)
-enemy.contactDamage = speciesContactDamage(species)
 enemy.targetable = true
 enemy.phased = false
 enemy.alive = true
@@ -36414,6 +36475,7 @@ if (rawDamage <= 0 && result.knockbackApplied) result.outcome = OUT_CONTROL_APPL
 }
 
 // 8. death hooks
+syncEnemyHealthBar(enemy)
 if (result.killed) {
 queueDeathHooks(enemy)
 markEnemyForDestroy(enemy.id)
@@ -36572,6 +36634,7 @@ enemy.regenAccumMs += dtMs
 while (enemy.regenAccumMs >= REGEN_TICK_MS && enemy.hp < enemy.maxHp) {
 enemy.regenAccumMs -= REGEN_TICK_MS
 enemy.hp = Math.min(enemy.maxHp, enemy.hp + REGEN_HEAL_PER_TICK)
+syncEnemyHealthBar(enemy)
 createEffect("effect.regen", 0, REGEN_EFFECT_MS, enemy.visualX, enemy.visualY, 0)
 }
 }
@@ -36594,6 +36657,7 @@ if (enemy.actionMs > 0) return
 if (!farmTasks.cropAlive(enemy.objectiveCropSlot) && !refreshEnemyCropObjective(enemy)) return
 enemy.attackViewUntil = elapsedMs + 90
 farmTasks.cropDamage(enemy.objectiveCropSlot, speciesCropBiteDamage(enemy.species))
+createEffect("effect.shrug", 0, 180, enemy.objectiveX, enemy.objectiveY, 0)
 // Damage may have destroyed this crop synchronously. Select the next living
 // authored priority immediately, without changing route/travel progress.
 if (!farmTasks.cropAlive(enemy.objectiveCropSlot)) refreshEnemyCropObjective(enemy)
@@ -36814,7 +36878,7 @@ return true
 if (placementAt(progress, currentArea, slotId)) return true
 let cap = defenderCapForArea(currentArea)
 if (cap <= 0) {
-farmWorld.notice("This raid is player-only.")
+farmWorld.notice("Starter plants guard these beds. No power defender is needed yet.")
 return true
 }
 if (placementCount(progress, currentArea) >= cap) {
@@ -37339,9 +37403,9 @@ return 3
 }
 
 function weaponReachPx(weapon: number): number {
-if (weapon == farmTypes.Weapon.LongHeavy) return 24
-if (weapon == farmTypes.Weapon.ShortQuick) return 12
-return 16
+if (weapon == farmTypes.Weapon.LongHeavy) return 40
+if (weapon == farmTypes.Weapon.ShortQuick) return 28
+return 32
 }
 
 function weaponCooldownMs(weapon: number): number {
@@ -37384,49 +37448,46 @@ let dy = enemy.visualY - player.y
 let forward = dx * playerFacingX + dy * playerFacingY
 if (forward < 0 || forward > reachPx) return false
 let side = Math.abs(-playerFacingY * dx + playerFacingX * dy)
-// Ten pixels gives the short forward arc enough width for ordinary 16 px
-// sprites without turning it into a radial attack behind the player.
-return side <= 10
+// The arc follows the visible 32 px enemies while retaining a forward-only
+// bounded attack. It never turns into an overlap-driven projectile hit.
+return side <= 16
 }
 
 function swordView(weapon: number, direction: number): Image {
 let slot = weapon * 4 + direction
 while (weaponViews.length <= slot) weaponViews.push(null)
 if (weaponViews[slot]) return weaponViews[slot]
-let reach = weaponReachPx(weapon)
-let size = reach * 2 + 10
-let result = image.create(size, size)
-let center = Math.idiv(size, 2)
-let fx = direction == 0 ? 1 : direction == 1 ? -1 : 0
-let fy = direction == 2 ? 1 : direction == 3 ? -1 : 0
-let previousX = 0; let previousY = 0
-for (let side = -9; side <= 9; side += 3) {
-let forward = reach - Math.idiv(side * side, Math.max(1, reach))
-let x = center + fx * forward - fy * side
-let y = center + fy * forward + fx * side
-if (side > -9) {
-for (let ox = -1; ox <= 1; ox++) for (let oy = -1; oy <= 1; oy++) result.drawLine(previousX + ox, previousY + oy, x + ox, y + oy, 15)
-result.drawLine(previousX, previousY, x, y, 5)
-}
-result.setPixel(x - fx * 3, y - fy * 3, 1)
-previousX = x; previousY = y
-}
 let source = farmArt.frame(weaponArtKey(weapon), 0)
-let bladeSize = reach + 8
-// Enlarge the actual blade silhouette, removing old transparent padding.
 let minX = source.width - 1; let minY = source.height - 1
 let maxX = 0; let maxY = 0
 for (let y = 0; y < source.height; y++) for (let x = 0; x < source.width; x++) if (source.getPixel(x, y) > 0) {
 minX = Math.min(minX, x); minY = Math.min(minY, y)
 maxX = Math.max(maxX, x); maxY = Math.max(maxY, y)
 }
-let bladeForward = reach - Math.idiv(bladeSize, 2)
-for (let y = 0; y < bladeSize; y++) for (let x = 0; x < bladeSize; x++) {
-let color = source.getPixel(minX + Math.idiv(x * (maxX - minX + 1), bladeSize), minY + Math.idiv(y * (maxY - minY + 1), bladeSize))
-if (color > 0) result.setPixel(center + fx * bladeForward + x - Math.idiv(bladeSize, 2), center + fy * bladeForward + y - Math.idiv(bladeSize, 2), color)
+// Cache a small actual sword silhouette, without the old hero-centered arc.
+let size = 18
+let result = image.create(size, size)
+for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+let color = source.getPixel(minX + Math.idiv(x * (maxX - minX + 1), size), minY + Math.idiv(y * (maxY - minY + 1), size))
+let rx = x; let ry = y
+if (direction == 0) { rx = y; ry = size - 1 - x }
+else if (direction == 1) { rx = size - 1 - y; ry = x }
+else if (direction == 2) { rx = size - 1 - x; ry = size - 1 - y }
+result.setPixel(rx, ry, color)
 }
 weaponViews[slot] = result
 return result
+}
+
+function updateWeaponView(): void {
+if (!weaponView) return
+if (elapsedMs >= weaponViewUntil) {
+weaponView.setFlag(SpriteFlag.Invisible, true)
+return
+}
+let progress = Math.min(1, (elapsedMs - weaponViewStarted) / Math.max(1, weaponViewDuration))
+let distance = 18 + (weaponViewReach - 18) * progress
+weaponView.setPosition(weaponViewOriginX + weaponViewFacingX * distance, weaponViewOriginY + weaponViewFacingY * distance)
 }
 
 function showWeaponSwing(player: Sprite, weapon: number): void {
@@ -37438,35 +37499,19 @@ weaponView = sprites.create(picture, ProjectileKind)
 weaponView.setFlag(SpriteFlag.Ghost, true)
 }
 weaponView.setImage(picture)
-weaponView.setPosition(player.x, player.y)
-weaponView.z = 10020
+weaponViewOriginX = player.x
+weaponViewOriginY = player.y
+weaponViewFacingX = playerFacingX
+weaponViewFacingY = playerFacingY
+weaponViewStarted = elapsedMs
+weaponViewDuration = weaponSwingMs(weapon)
+weaponViewUntil = elapsedMs + weaponViewDuration
+weaponViewReach = weaponReachPx(weapon)
+// Hero draws above the cosmetic sword even where the silhouettes touch.
+weaponView.z = player.z - 1
 weaponView.setFlag(SpriteFlag.Invisible, false)
-weaponViewUntil = elapsedMs + weaponSwingMs(weapon)
+updateWeaponView()
 farmAvatar.attackCue(playerFacingX, playerFacingY)
-}
-
-function updatePlayerContactDamage(): void {
-if (playerInvulnerableMs > 0) return
-let player = farmWorld.player()
-if (!player) return
-for (let i = 0; i < enemies.length; i++) {
-let enemy = enemies[i]
-if (!enemy || enemy.epoch != epoch || !enemy.alive || enemy.pendingDestroy || !enemy.sprite || enemy.previewOnly) continue
-if (enemy.contactDamage <= 0) continue
-// Use bounded center distance rather than a second overlap event handler;
-// World remains the sole top-level input/update owner.
-if (distanceSquared(enemy.visualX, enemy.visualY, player.x, player.y) > 144) continue
-enemy.attackViewUntil = elapsedMs + 90
-farmWorld.changePlayerHp(-enemy.contactDamage)
-playerInvulnerableMs = PLAYER_CONTACT_GATE_MS
-// World remains HP authority. The binding seam amendment gives Combat a
-// read-only observation so zero HP settles the active raid exactly once.
-if (raidActive && farmWorld.playerHealth() <= 0) {
-settleRaid(false)
-return
-}
-break
-}
 }
 
 function queueCommittedEnemyHit(targetId: number, travelMs: number, damage: number, damageType: number, groundOnly: boolean, knockbackPx: number, sourceX: number, sourceY: number): void {
@@ -37500,6 +37545,48 @@ if (target && target.alive && !target.pendingDestroy) {
 applyEnemyEffect(target, hit.damage, hit.damageType, hit.groundOnly, hit.knockbackPx, hit.sourceX, hit.sourceY)
 }
 pendingEnemyHits.removeAt(i)
+}
+}
+
+function updateStarterCropGuards(dtMs: number): void {
+if (!raidActive || raidStage != RAID_STAGE_ACTIVE || raidArea != 1 || !activeLayout) return
+let count = Math.min(baseRaidCropCount(1), activeLayout.cropTiles.length)
+for (let local = 1; local <= count; local++) {
+while (starterGuardCooldowns.length < local) starterGuardCooldowns.push((local - 1) * 150)
+starterGuardCooldowns[local - 1] = Math.max(0, starterGuardCooldowns[local - 1] - dtMs)
+// cropAlive is true only for actual prepared crops armed by Farming;
+// their Plant + Water routines remain the learner's current work.
+if (!farmTasks.cropAlive(local) || starterGuardCooldowns[local - 1] > 0) continue
+let sourceTile = activeLayout.cropTiles[local - 1]
+let sourceX = tileCenterX(sourceTile); let sourceY = tileCenterY(sourceTile)
+let target: EnemyRuntime = null
+let bestProgress = -1
+for (let i = 0; i < enemies.length; i++) {
+let enemy = enemies[i]
+if (!enemy.alive || enemy.pendingDestroy || enemy.previewOnly || enemy.epoch != epoch || !enemy.targetable || enemy.phased) continue
+if (distanceSquared(sourceX, sourceY, enemy.visualX, enemy.visualY) > STARTER_GUARD_RANGE_PX * STARTER_GUARD_RANGE_PX) continue
+let committed = 0
+for (let h = 0; h < pendingEnemyHits.length; h++) {
+if (pendingEnemyHits[h].epoch == epoch && pendingEnemyHits[h].targetActorId == enemy.id) committed += pendingEnemyHits[h].damage
+}
+if (committed >= enemy.hp) continue
+let progress = routeThreatProgress(enemy)
+if (!target || progress > bestProgress || (progress == bestProgress && enemy.id < target.id)) {
+target = enemy
+bestProgress = progress
+}
+}
+if (!target) continue
+let dx = target.visualX - sourceX; let dy = target.visualY - sourceY
+let distance = Math.max(1, Math.sqrt(dx * dx + dy * dy))
+let travelMs = Math.max(1, Math.round(distance * 1000 / SIX_SHOOTER_PROJECTILE_SPEED))
+let effect = createEffect("effect.shot", 0, travelMs, sourceX, sourceY, 0)
+if (effect && effect.sprite) {
+effect.sprite.vx = dx / distance * SIX_SHOOTER_PROJECTILE_SPEED
+effect.sprite.vy = dy / distance * SIX_SHOOTER_PROJECTILE_SPEED
+}
+queueCommittedEnemyHit(target.id, travelMs, STARTER_GUARD_DAMAGE, DAMAGE_ORDINARY, false, 0, sourceX, sourceY)
+starterGuardCooldowns[local - 1] = STARTER_GUARD_INTERVAL_MS
 }
 }
 
@@ -38260,6 +38347,7 @@ function setPreviewEnemyHp(enemy: EnemyRuntime, hp: number): void {
 if (!enemy) return
 enemy.maxHp = Math.max(1, hp)
 enemy.hp = enemy.maxHp
+syncEnemyHealthBar(enemy)
 }
 
 function previewRangeTile(defender: DefenderRuntime, radius: number, index: number): number {
@@ -40682,8 +40770,7 @@ return raidScheduledSpawns.length == 0 && blockedSpawns.length == 0 && pendingCh
 function beginRaidCountdown(): void {
 if (!raidActive || raidStage != RAID_STAGE_SETUP) return
 // Mineberry setup consequences (armed mines) persist, but all defender HP
-// and physical stores begin the actual battle full. Player HP is World-owned
-// and is restored by World before beginRaid under the shared lifecycle.
+// and physical stores begin the actual battle full. The hero has no HP.
 restoreRaidDefenders()
 raidStage = RAID_STAGE_COUNTDOWN
 raidCountdownRemainingMs = RAID_COUNTDOWN_MS
@@ -40746,6 +40833,7 @@ function settleRaid(success: boolean): void {
 if (!raidActive || raidResultSent) return
 let finishingArea = raidArea
 let finishingEpoch = epoch
+let failureReason = farmTasks.livingCropCount() <= 0 ? "All plants were lost. Setup restored - plant, water, and try again." : "Raid setup could not start. Setup restored - check your plants and defenders."
 raidResultSent = true
 raidSettled = true
 raidActive = false
@@ -40755,6 +40843,7 @@ clearRaidBattleTransient()
 // This is the only durable raid-result call owned by Combat. World commits
 // successful rooting/progression or restores its pre-raid snapshot on false.
 farmWorld.raidFinished(success)
+if (!success) farmWorld.notice(failureReason)
 
 // raidFinished is synchronous in the service contract. Rebuild transient
 // defenders from World's post-result authority so success revives rooted
@@ -40812,22 +40901,13 @@ beginRaidWavePhase(nextPhase)
 return
 }
 
-// All schedulable identities/queued children are resolved here. Player HP
-// and crop objectives are both authoritative read-only checks.
-if (farmWorld.playerHealth() <= 0) settleRaid(false)
-else if (farmTasks.livingCropCount() > 0) settleRaid(true)
+// Every enemy/queued child must be resolved, with actual crops surviving.
+if (farmTasks.livingCropCount() > 0) settleRaid(true)
 else settleRaid(false)
 }
 
 function updateRaidLifecycle(dtMs: number): void {
 if (!raidActive) return
-// raidFinished(false) may synchronously restore HP through World rollback, so
-// return immediately after settlement and never reinterpret that restoration
-// as revival of the same attempt.
-if (farmWorld.playerHealth() <= 0) {
-settleRaid(false)
-return
-}
 if (raidStage == RAID_STAGE_SETUP) updateRaidSetup()
 else if (raidStage == RAID_STAGE_COUNTDOWN) updateRaidCountdown(dtMs)
 else if (raidStage == RAID_STAGE_ACTIVE) updateRaidActive(dtMs)
@@ -40850,7 +40930,6 @@ elapsedMs = 0
 clearRaidState()
 clearRuntimeCollections()
 playerAttackCooldownMs = 0
-playerInvulnerableMs = 0
 playerFacingX = 0
 playerFacingY = 1
 ensureMonsterViews()
@@ -40876,10 +40955,9 @@ export function update(dtMs: number): void {
 if (!entered) return
 let dt = clampDt(dtMs)
 elapsedMs += dt
-if (weaponView && elapsedMs >= weaponViewUntil) weaponView.setFlag(SpriteFlag.Invisible, true)
+updateWeaponView()
 if (raidActive) raidElapsedMs += dt
 if (playerAttackCooldownMs > 0) playerAttackCooldownMs = Math.max(0, playerAttackCooldownMs - dt)
-if (playerInvulnerableMs > 0) playerInvulnerableMs = Math.max(0, playerInvulnerableMs - dt)
 updatePlayerFacing()
 for (let i = 0; i < defenders.length; i++) {
 let defender = defenders[i]
@@ -40897,11 +40975,11 @@ updateEnemyControlTimers(dt)
 // Ground actors advance only on their authored route. Sky Wisp direct
 // flight is the sole route exception and still maintains currentTile.
 updateEnemyMovement(dt)
+updateStarterCropGuards(dt)
 updateEnemyStates(dt)
 updateEnergyRecharge(dt)
 updateDefenderPowerTriggers(dt)
 updateMines()
-updatePlayerContactDamage()
 updateCommittedEnemyHits(dt)
 updateEnemyVisuals()
 updateEffects(dt)
@@ -40998,12 +41076,12 @@ raidScheduledSpawns = []
 blockedSpawns = []
 pendingChildren = []
 raidInitialCropCount = farmTasks.livingCropCount()
+starterGuardCooldowns = []
 
-// Empty objectives or an already-dead World-owned player are real soft
-// failures, not successful empty attempts. livingCropCount above also
+// Empty objectives are real soft failures. livingCropCount above also
 // performs Farming's required raid-objective synchronization before any
 // individual cropAlive queries occur during spawning/biting.
-if (raidInitialCropCount <= 0 || farmWorld.playerHealth() <= 0) {
+if (raidInitialCropCount <= 0) {
 raidStage = RAID_STAGE_SETUP
 settleRaid(false)
 return true
@@ -41175,8 +41253,8 @@ farmWorld.notice("This area's raid routes need authored crop priorities.")
 return false
 }
 
-// A1 is intentionally player-only. farmTasks.ready owns its farm routine;
-// Combat contributes no defender requirement.
+// A1 uses actual watered starter crops plus the hero sword. farmTasks.ready
+// owns preparation; Combat contributes no placed power defender requirement.
 if (area == 1) return true
 
 let cap = defenderCapForArea(area)
@@ -41308,7 +41386,6 @@ const EXPANSION_LABEL_TIER1: string[] = [
 const EXPANSION_LABEL_TIER2: string[] = ["", "SEED BUNDLE II", "", "", "", "", "", "", "", "", "", "", ""]
 
 const STARTING_GOLD = 0
-const STARTING_HP = 20
 const STARTING_MOVE_SPEED = 180
 const SAVE_DEBOUNCE_MS = 10000
 const NOTICE_MS = 1200
@@ -41347,7 +41424,6 @@ let currentProgress: farmTypes.Progress = null
 let currentPlayer: Sprite = null
 let currentLayout: farmTypes.Layout = null
 let started = false
-let playerHp = STARTING_HP
 let saveBlocked = false
 let saveRecoveryMessage = ""
 let worldObjectSprites: Sprite[] = []
@@ -42383,7 +42459,6 @@ activeRaidArea = area
 // snapshot records RAID, while recovery records the exact adjustable
 // PREP setup. A reload at any point therefore returns to PREP.
 currentProgress.phase[area] = farmTypes.Phase.Raid
-playerHp = STARTING_HP
 let currentFarm = farmTasks.exportState()
 if (!currentFarm || !farmSave.write(currentProgress, currentFarm, raidRecoveryProgress, raidRecoveryFarm)) {
 currentProgress = preProgress
@@ -42613,6 +42688,15 @@ if (object.kind == kind && (arg == 999 || object.arg == arg)) return object.id
 return -1
 }
 
+function ripeHarvestTarget(): number {
+if (!currentLayout) return -1
+for (let i = 0; i < currentLayout.objects.length; i++) {
+let object = currentLayout.objects[i]
+if (object.kind == farmTypes.ObjectKind.Harvest && farmTasks.harvestReady(object.arg)) return object.id
+}
+return -1
+}
+
 function directNext(text: string, targetId: number): void {
 if (nextInstruction != text) nextInstructionLines = wrapLine("Next: " + text, Math.floor((VIEWPORT_WIDTH - 24) / image.font8.charWidth))
 nextInstruction = text
@@ -42663,7 +42747,7 @@ return
 }
 let phase = currentProgress.phase[area]
 if (phase == farmTypes.Phase.Raid) {
-directNext("Defend the plants! Move close and press B to swing.", -1)
+directNext("Protect your plants! B swings ahead; watch enemy health bars.", -1)
 return
 }
 if (phase == farmTypes.Phase.Farm || phase == farmTypes.Phase.Prep) {
@@ -42708,7 +42792,7 @@ directNext("A at the blinking shield pad to start the raid.", instructionTarget(
 return
 }
 if (currentProgress.complete) {
-directNext("Farm complete! Harvest, upgrade or revisit your plants.", instructionTarget(farmTypes.ObjectKind.Harvest))
+directNext("Farm complete! Harvest, upgrade or revisit your plants.", ripeHarvestTarget())
 return
 }
 let nextArea = Math.min(12, area + 1)
@@ -42723,7 +42807,7 @@ let stock = 0
 for (let i = 1; i <= 12; i++) stock += currentProgress.inventory[i]
 directNext(stock > 0 ? "Go home and sell harvest; then open the next gate."
 : "A at a ripe plant to harvest. Sell harvest at home.",
-stock > 0 ? instructionTarget(farmTypes.ObjectKind.Travel, 0) : instructionTarget(farmTypes.ObjectKind.Harvest))
+stock > 0 ? instructionTarget(farmTypes.ObjectKind.Travel, 0) : ripeHarvestTarget())
 }
 }
 
@@ -42773,7 +42857,7 @@ facingY = vy < 0 ? -1 : 1
 
 function drawHud(): void {
 if (!started || !currentProgress) return
-farmHud.update(playerHp, currentProgress.gold, nextInstruction, !menuOpen)
+farmHud.update(currentProgress.gold, nextInstruction, !menuOpen)
 }
 
 function drawNotice(): void {
@@ -42902,7 +42986,6 @@ if (started) return
 started = true
 farmWorldView.installPalette()
 installUiAndControls()
-playerHp = STARTING_HP
 let loaded = farmSave.load()
 saveBlocked = loaded.status == farmSave.LoadStatus.Corrupt || loaded.status == farmSave.LoadStatus.Future
 if (saveBlocked) {
@@ -42968,7 +43051,7 @@ return currentLayout ? currentLayout.interior : 0
 }
 
 export function notice(message: string): void {
-showNotice(message, NOTICE_MS)
+showNotice(message, message.indexOf("RAID FAILED") == 0 || message.indexOf("HARVESTED") == 0 ? RECOVERY_NOTICE_MS : NOTICE_MS)
 }
 
 export function taskResult(result: farmTypes.RunResult): void {
@@ -43040,7 +43123,6 @@ notice("RAID RECOVERY FAILED - RESTART")
 return
 }
 currentProgress = cloneProgress(raidRecoveryProgress)
-playerHp = STARTING_HP
 restoreResume(raidRecoveryResume)
 clearRaidRecovery()
 checkpoint("raid-failure")
@@ -43057,23 +43139,19 @@ if (currentProgress.placements[i].area == area) currentProgress.placements[i].ro
 currentProgress.cleared[area] = 1
 currentProgress.phase[area] = farmTypes.Phase.Production
 if (area == 12) currentProgress.complete = true
-playerHp = STARTING_HP
 clearRaidRecovery()
 checkpoint("raid-success")
-notice(area == 12 ? "MAGICAL FARM COMPLETE" : cropName(area) + " UNLOCKED")
+showNotice(area == 12 ? "MAGICAL FARM COMPLETE" : "RAID WON! FACE A RIPE PLANT + A TO HARVEST.", RECOVERY_NOTICE_MS)
 }
 
-// Read-only combat observation. World retains all HP mutation/reset authority.
+// Compatibility only for older peers: the hero has no HP or damage system.
+// Combat never reads these retired functions; plant loss decides raid failure.
 export function playerHealth(): number {
-if (!started || resetPendingRestart) return 0
-return playerHp
+return started && !resetPendingRestart ? 1 : 0
 }
 
 export function changePlayerHp(delta: number): void {
-if (!ensureProgress()) return
-playerHp += delta
-if (playerHp < 0) playerHp = 0
-if (playerHp > STARTING_HP) playerHp = STARTING_HP
+// Retired API intentionally cannot change the game or make a raid fail.
 }
 
 export function addInventory(crop: number, delta: number): boolean {

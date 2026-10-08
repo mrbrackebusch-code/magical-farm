@@ -14,6 +14,9 @@ PRIMM source: Raspberry Pi Foundation, [PRIMM pedagogy summary](https://static.r
 Prebuilt gameplay menus use [Arcade Mini Menu](https://github.com/riknoll/arcade-mini-menu), pinned at v0.1.0. Copyright (c) 2022 Richard Knoll, MIT License; see LICENSES/Arcade-Mini-Menu-MIT.txt. This extension is approved partner content, not original Farm artwork.
 
 
+Enemy health indicators use [Sprite Status Bar](https://github.com/jwunderl/pxt-status-bar), pinned at v0.4.1. Copyright (c) 2020 Joey Wunderlich, MIT License; see LICENSES/Sprite-Status-Bar-MIT.txt. Bars display real enemy health; the player has no health system.
+
+
 Characters: isaiah658, [Pixel Pack 2](https://opengameart.org/content/isaiah658s-pixel-pack-2), CC0. Changes: deliberate shared-palette material mapping, explicit skin-mask tan/brown variants and nearest-neighbor 2x display; no new pixel detail.
 
 Environment tiles: [16x16 RPG Tileset by hilau](https://opengameart.org/content/16x16-rpg-tileset), based on George Bailey and bluecarrot16. The source offers CC BY-SA 3.0 or GPL 3.0; this project uses the Creative Commons option and distributes adapted tile artwork under CC BY-SA 4.0 as allowed by CC BY-SA 3.0 section 4(b). George Bailey’s original contributions retain CC BY 4.0. Changes: selected crops, material palette mapping, exposed black contours,16px normalization, soil tints and assembled building pieces. The complete requested attribution and upstream notices are in [CREDITS.md](CREDITS.md) and [LICENSES/World-Tiles.md](LICENSES/World-Tiles.md). These art terms apply to the image data even when embedded in runtime code; the instructional license does not impose a noncommercial restriction on them.
