@@ -32590,6 +32590,7 @@ namespace farmTasks {
 // Private domain sprite kinds. Peers never name these kinds.
 const CropKind = SpriteKind.create()
 const HelperKind = SpriteKind.create()
+const CropHealthKind = StatusBarKind.create()
 
 // Context.data common fields. Task-specific fields begin at DATA_TASK.
 const DATA_STATUS = 0
@@ -32668,6 +32669,7 @@ let workContexts: farmTypes.Context[] = []
 let lastWorkTask: number[] = []
 let cropSprites: Sprite[] = []
 let cropSpriteSlots: number[] = []
+let cropHealthBars: StatusBarSprite[] = []
 let taskSprites: Sprite[] = []
 let taskContext: farmTypes.Context = null
 let stationLabels: Sprite[] = []
@@ -32778,6 +32780,10 @@ return Math.idiv(tile, activeLayout.width) * 16 + 8
 }
 
 function destroyCropSprites(): void {
+for (let i = 0; i < cropHealthBars.length; i++) {
+if (cropHealthBars[i]) cropHealthBars[i].destroy()
+}
+cropHealthBars = []
 for (let i = 0; i < cropSprites.length; i++) {
 if (cropSprites[i]) cropSprites[i].destroy()
 }
@@ -33457,6 +33463,20 @@ farmPlantArt.place(sprite, sprite.x, sprite.y)
 sprite.setFlag(SpriteFlag.Ghost, true)
 cropSprites.push(sprite)
 cropSpriteSlots.push(slot)
+let bar: StatusBarSprite = null
+// Only raid objectives have HP. Production crops and invulnerable
+// defenders must not display an invented health value.
+if (cropState[slot] == CROP_GROWING && cropHp[slot] > 0) {
+bar = statusbars.create(24, 4, CropHealthKind)
+bar.setColor(7, 2)
+bar.setBarBorder(1, 15)
+bar.max = raidHpForSlot(activeArea, local)
+bar.value = cropHp[slot]
+bar.attachToSprite(sprite, 2, 0)
+bar.positionDirection(CollisionDirection.Top)
+bar.z = sprite.z + 1
+}
+cropHealthBars.push(bar)
 }
 }
 
@@ -34859,6 +34879,15 @@ if (cropHp[slot] <= 0) {
 cropHp[slot] = 0
 cropState[slot] = CROP_WILTED
 refreshActiveCrops()
+} else {
+// Surviving damage changes the existing bar in place; no new
+// images or sprites are allocated per hit or animation frame.
+for (let i = 0; i < cropSpriteSlots.length; i++) {
+if (cropSpriteSlots[i] == slot && cropHealthBars[i]) {
+cropHealthBars[i].value = cropHp[slot]
+break
+}
+}
 }
 }
 
